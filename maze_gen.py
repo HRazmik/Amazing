@@ -18,7 +18,7 @@ class Grid:
     def __init__(self, width: int, height: int) -> None:
         self.width = width
         self. height = height
-        self.cells = list[list[Cell]] = []
+        self.cells: list[list[Cell]] = []
 
         for y in range(height):
             row: list[Cell] = []
@@ -27,5 +27,11 @@ class Grid:
             self.cells.append(row)
 
     def get(self, x: int, y: int) -> Cell:
-        return self.cells[y][x]
-    
+        if x >= 0 and y >= 0 and x < self.width and y < self.height:
+            return self.cells[y][x]
+        else:
+            return None
+        
+ 
+
+
