@@ -1,0 +1,36 @@
+Cell & Grid structure +
+
+Cell with 4-bit walls+
+Grid as 2D matrix of cells+
+
+
+Config parser
+
+Read config.txt
+Validate all 6 mandatory keys
+
+
+Maze generation
+
+Carve passages randomly using a seed
+Apply all restrictions (no 3x3 open areas, border walls, "42" pattern, perfect mode)
+
+
+Pathfinding
+
+Find shortest path from entry to exit
+Store it as N/E/S/W string
+
+
+Output writer
+
+Convert each cell's walls to hex digit
+Write grid row by row to file
+Append entry coords, exit coords, and path
+
+
+Visualization
+
+Display the maze on screen
+Show walls, entry, exit, solution path
+User interactions (regenerate, toggle path, change colors)
