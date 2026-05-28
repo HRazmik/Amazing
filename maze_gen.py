@@ -29,8 +29,8 @@ class Grid:
             self.cells.append(row)
 
     def get(self, x: int, y: int) -> Cell | None:
-        if x >= 0 and y >= 0 and x < self.width and y < self.height:
-            return self.cells[y][x]
+        if x >= 0 and y >= 0 and y < self.width and x < self.height:
+            return self.cells[x][y]
         else:
             return None
 
@@ -67,11 +67,13 @@ class Grid:
     def generate(self) -> None:
         for i in range(self.height):
             for j in range(self.width):
-                if j == 0:
-                    self.cells[i][j].add_wall(0x1)
                 if i == 0:
-                    self.cells[i][j].add_wall(0x8)
-                if j == self.height - 1:
+                    self.cells[i][j].add_wall(0x1)
+                elif i == self.height - 1:
                     self.cells[i][j].add_wall(0x4)
-                if i == self.width - 1:
+                if j == 0:
+                    self.cells[i][j].add_wall(0x8)
+                elif j == self.width - 1:
                     self.cells[i][j].add_wall(0x2)
+                print(self.cells[i][j].walls, end=' ')
+            print()

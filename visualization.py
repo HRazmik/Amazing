@@ -29,15 +29,6 @@ rows = [
 
 matrix = [[int(c, 16) for c in row] for row in rows]
 
-def north(cell: int) -> bool:
-    return bool(cell & 0x1)
-def east(cell: int) -> bool:
-    return bool(cell & 0x2)
-def south(cell: int) -> bool:
-    return bool(cell & 0x4)
-def west(cell: int) -> bool:
-    return bool(cell & 0x8)
-
 class visualizer:
     def __init__(self,
                  grid: Grid,
@@ -55,6 +46,7 @@ class visualizer:
 
 
     def input(self, maze: list[list[int]]) -> None:
+        print("ololo", self.grid.height, self.grid.width)
         for i in range(self.grid.height):
             rend_i = i * 2 + 1
             for j in range(self.grid.width):
@@ -137,15 +129,10 @@ class visualizer:
         print(RESET, end='')
 
 
-matrixxx = Grid(20, 25)
+matrixxx = Grid(8, 2)
 matrixxx.generate()
+
 
 output = visualizer(matrixxx, (19, 20), (7, 18))
 output.input(matrix)
 output.draw("\033[1;92m", "\033[;36m")
-print("salam alekum alekum a")
-for i in range(matrixxx.height):
-    for j in range(matrixxx.width):
-        print(matrixxx.get(j, i).walls, end =' ')
-    print()
-
