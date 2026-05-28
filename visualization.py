@@ -1,3 +1,7 @@
+
+
+from maze_gen import Cell, Grid
+
 BLOCK = "\u2588"
 SPACE = " "
 rows = [
@@ -8,8 +12,8 @@ rows = [
     "96842A852AC07AAD13A8283C2",
     "C1296C43AAB83AA92AA8686BA",
     "92E853968428444682AC12902",
-    "AC3814452FA83FFF82C52C42A",
-    "85684117AFC6857FAC1383D06",
+    "AC3814452FA83FFF92C52C42A",
+    "85684117AFC6857FBC1383D06",
     "C53AD043AFFFAFFF856AA8143",
     "91441294297FAFD501142C6BA",
     "AA912AC3843FAFFF82856D52A",
@@ -25,77 +29,123 @@ rows = [
 
 matrix = [[int(c, 16) for c in row] for row in rows]
 
-
-def north(cell):
+def north(cell: int) -> bool:
     return bool(cell & 0x1)
-
-
-def east(cell):
+def east(cell: int) -> bool:
     return bool(cell & 0x2)
-
-
-def south(cell):
+def south(cell: int) -> bool:
     return bool(cell & 0x4)
-
-
-def west(cell):
+def west(cell: int) -> bool:
     return bool(cell & 0x8)
 
-
 class visualizer:
-    def __init__(self, height: int = -1, width: int = -1) -> None:
-        self.width: int = width
-        self.height: int = height
-        self.block_matrix: list[list[str]] = \
-            [[" " for i in range(self.width * 2 + 1)] for i in range(self.height * 2 + 1)]
+    def __init__(self,
+                 grid: Grid,
+                 start: tuple[int, int],
+                 end: tuple[int, int]) -> None:
+        self.grid = grid
+        self.b_matrix: list[list[str]] = []
+        self.start: tuple[int, int] = start
+        self.end: tuple[int, int] = end
+        for i in range(self.grid.height * 2 + 1):
+            temp_arr: list[str] = []
+            for j in range(self.grid.width * 2 + 1):
+                temp_arr.append(" ")
+            self.b_matrix.append(temp_arr)
+
 
     def input(self, maze: list[list[int]]) -> None:
-        for i in range(self.height):
-            for j in range(self.width):
-                rend_i = i * 2 + 1
+        for i in range(self.grid.height):
+            rend_i = i * 2 + 1
+            for j in range(self.grid.width):
                 rend_j = j * 2 + 1
-                if north(maze[i][j]):
-                    self.block_matrix[rend_i - 1][rend_j] = BLOCK
-                    if j - 1 >= 0 and north(maze[i][j - 1]):
-                        self.block_matrix[rend_i - 1][rend_j - 1] = BLOCK
-                    if j + 1 < self.width and north(maze[i][j + 1]):
-                        self.block_matrix[rend_i - 1][rend_j + 1] = BLOCK
-                    if west(maze[i][j]):
-                        self.block_matrix[rend_i - 1][rend_j - 1] = BLOCK
-                    if east(maze[i][j]):
-                        self.block_matrix[rend_i - 1][rend_j + 1] = BLOCK
-                if south(maze[i][j]):
-                    self.block_matrix[rend_i + 1][rend_j] = BLOCK
-                    if j - 1 >= 0 and south(maze[i][j - 1]):
-                        self.block_matrix[rend_i + 1][rend_j - 1] = BLOCK
-                    if j + 1 < self.width and south(maze[i][j + 1]):
-                        self.block_matrix[rend_i + 1][rend_j + 1] = BLOCK
-                    if west(maze[i][j]):
-                        self.block_matrix[rend_i + 1][rend_j - 1] = BLOCK
-                    if east(maze[i][j]):
-                        self.block_matrix[rend_i + 1][rend_j + 1] = BLOCK
-                if east(maze[i][j]):
-                    self.block_matrix[rend_i][rend_j + 1] = BLOCK
-                    if i - 1 >= 0 and east(maze[i - 1][j]):
-                        self.block_matrix[rend_i - 1][rend_j + 1] = BLOCK
-                    if i + 1 < self.height and east(maze[i + 1][j]):
-                        self.block_matrix[rend_i + 1][rend_j + 1] = BLOCK
-                if west(maze[i][j]):
-                    self.block_matrix[rend_i][rend_j - 1] = BLOCK
-                    if i - 1 >= 0 and west(maze[i - 1][j]):
-                        self.block_matrix[rend_i - 1][rend_j - 1] = BLOCK
-                    if i + 1 < self.height and west(maze[i + 1][j]):
-                        self.block_matrix[rend_i + 1][rend_j - 1] = BLOCK
+                if self.grid.north(i, j):
+                    self.b_matrix[rend_i - 1][rend_j] = BLOCK
+                    if self.grid.west(i,j):
+                        self.b_matrix[rend_i - 1][rend_j - 1] = BLOCK
+                    elif self.grid.north(i, j - 1):
+                        self.b_matrix[rend_i - 1][rend_j - 1] = BLOCK
+                    if self.grid.east(i, j):
+                        self.b_matrix[rend_i - 1][rend_j + 1] = BLOCK
+                    elif self.grid.north(i, j + 1):
+                        self.b_matrix[rend_i - 1][rend_j + 1] = BLOCK
+                if self.grid.south(i, j):
+                    self.b_matrix[rend_i + 1][rend_j] = BLOCK
+                    if self.grid.west(i, j):
+                        self.b_matrix[rend_i + 1][rend_j - 1] = BLOCK
+                    elif self.grid.south(i, j - 1):
+                        self.b_matrix[rend_i + 1][rend_j - 1] = BLOCK
+                    if self.grid.east(i, j):
+                        self.b_matrix[rend_i + 1][rend_j + 1] = BLOCK
+                    elif self.grid.south(i, j + 1):
+                        self.b_matrix[rend_i + 1][rend_j + 1] = BLOCK
+                if self.grid.east(i, j):
+                    self.b_matrix[rend_i][rend_j + 1] = BLOCK
+                    if self.grid.east(i - 1, j):
+                        self.b_matrix[rend_i - 1][rend_j + 1] = BLOCK
+                    if self.grid.east(i + 1, j):
+                        self.b_matrix[rend_i + 1][rend_j + 1] = BLOCK
+                if self.grid.west(i, j):
+                    self.b_matrix[rend_i][rend_j - 1] = BLOCK
+                    if self.grid.west(i - 1, j):
+                        self.b_matrix[rend_i - 1][rend_j - 1] = BLOCK
+                    if self.grid.west(i + 1, j):
+                        self.b_matrix[rend_i + 1][rend_j - 1] = BLOCK
+                # if self.grid.get & 0xf == 15:
+                #     self.b_matrix[rend_i][rend_j] = BLOCK
 
-    def draw(self):
-        for line in self.block_matrix:
-            i = 1
-            for char in line:
-                i += 1
+
+    def draw(self, wall_colour: str, ft_colour: str) -> None:
+        GREEN = "\033[0;32m"
+        RED = "\033[0;31m"
+        BLUE = "\033[0;34m"
+        BOLD_YELLOW = "\033[1;33m"
+        BG_RED = "\033[41m"  # Background color
+        RESET = "\033[0m"
+        p42: list[list[int]] = [
+            [1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+            [0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+            [0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+            [0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0]
+        ]
+        print(wall_colour, end='')
+        for i in range(self.grid.height * 2 + 1):
+            for j in range(self.grid.width * 2 + 1):
+                center_i = (self.grid.height * 2 + 1) // 2 - 1
+                center_j = (self.grid.width * 2 + 1) // 2
+                char = self.b_matrix[i][j]
+                # if i >= center_i - 5 and i <= center_i + 5:
+                #     if j >= center_j - 7 and j <= center_j + 8:
+                #         if p42[i - (center_i - 5)][j - (center_j - 7)]:
+                #             print(ft_colour, end='')
+                #         else:
+                #             print(wall_colour, end='')
+                # if i == self.start[0] * 2 + 1 and j == self.start[1] * 2 + 1:
+                #     char = "\033[41m" + char + RESET + wall_colour
+                # if i == self.end[0] * 2 + 1 and j == self.end[1] * 2 + 1:
+                #     char = "\033[44m" + char + RESET + wall_colour
                 print(char, end='')
                 print(char, end='')
             print()
+        print(RESET, end='')
 
-output = visualizer(len(matrix), len(matrix[0]))
+
+matrixxx = Grid(20, 25)
+matrixxx.generate()
+
+output = visualizer(matrixxx, (19, 20), (7, 18))
 output.input(matrix)
-output.draw()
+output.draw("\033[1;92m", "\033[;36m")
+print("salam alekum alekum a")
+for i in range(matrixxx.height):
+    for j in range(matrixxx.width):
+        print(matrixxx.get(j, i).walls, end =' ')
+    print()
+
