@@ -46,30 +46,21 @@ class visualizer:
 
 
     def input(self, maze: list[list[int]]) -> None:
-        print("ololo", self.grid.height, self.grid.width)
         for i in range(self.grid.height):
             rend_i = i * 2 + 1
             for j in range(self.grid.width):
                 rend_j = j * 2 + 1
                 if self.grid.north(i, j):
                     self.b_matrix[rend_i - 1][rend_j] = BLOCK
-                    if self.grid.west(i,j):
+                    if self.grid.west(i,j) or self.grid.north(i, j - 1):
                         self.b_matrix[rend_i - 1][rend_j - 1] = BLOCK
-                    elif self.grid.north(i, j - 1):
-                        self.b_matrix[rend_i - 1][rend_j - 1] = BLOCK
-                    if self.grid.east(i, j):
-                        self.b_matrix[rend_i - 1][rend_j + 1] = BLOCK
-                    elif self.grid.north(i, j + 1):
+                    if self.grid.east(i, j) or self.grid.north(i, j + 1):
                         self.b_matrix[rend_i - 1][rend_j + 1] = BLOCK
                 if self.grid.south(i, j):
                     self.b_matrix[rend_i + 1][rend_j] = BLOCK
-                    if self.grid.west(i, j):
+                    if self.grid.west(i, j) or self.grid.south(i, j - 1):
                         self.b_matrix[rend_i + 1][rend_j - 1] = BLOCK
-                    elif self.grid.south(i, j - 1):
-                        self.b_matrix[rend_i + 1][rend_j - 1] = BLOCK
-                    if self.grid.east(i, j):
-                        self.b_matrix[rend_i + 1][rend_j + 1] = BLOCK
-                    elif self.grid.south(i, j + 1):
+                    if self.grid.east(i, j) or self.grid.south(i, j + 1):
                         self.b_matrix[rend_i + 1][rend_j + 1] = BLOCK
                 if self.grid.east(i, j):
                     self.b_matrix[rend_i][rend_j + 1] = BLOCK
@@ -107,32 +98,35 @@ class visualizer:
             [0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0],
             [0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0]
         ]
+        print()
         print(wall_colour, end='')
+        center_i = (self.grid.height * 2 + 1) // 2
+        center_j = (self.grid.width * 2 + 1) // 2
+        if self.grid.width % 2 == 0:
+            center_j -= 1
+        if self.grid.height % 2 == 0:
+            center_i -= 1
         for i in range(self.grid.height * 2 + 1):
             for j in range(self.grid.width * 2 + 1):
-                center_i = (self.grid.height * 2 + 1) // 2 - 1
-                center_j = (self.grid.width * 2 + 1) // 2
-                char = self.b_matrix[i][j]
-                # if i >= center_i - 5 and i <= center_i + 5:
-                #     if j >= center_j - 7 and j <= center_j + 8:
-                #         if p42[i - (center_i - 5)][j - (center_j - 7)]:
-                #             print(ft_colour, end='')
-                #         else:
-                #             print(wall_colour, end='')
-                # if i == self.start[0] * 2 + 1 and j == self.start[1] * 2 + 1:
-                #     char = "\033[41m" + char + RESET + wall_colour
-                # if i == self.end[0] * 2 + 1 and j == self.end[1] * 2 + 1:
-                #     char = "\033[44m" + char + RESET + wall_colour
+                char = self.b_matrix[i][j] * 2
+                if i >= center_i - 5 and i <= center_i + 5 and j >= center_j - 7 and j <= center_j + 8:
+                    if p42[i - (center_i - 5)][j - (center_j - 7)]:
+                        print(ft_colour, end='')
+                    else:
+                        print(wall_colour, end='')
+                if i == self.start[0] * 2 + 1 and j == self.start[1] * 2 + 1:
+                    char = "\033[44m" + char + RESET + wall_colour
+                if i == self.end[0] * 2 + 1 and j == self.end[1] * 2 + 1:
+                    char = "\033[41m" + char + RESET + wall_colour
                 print(char, end='')
-                print(char, end='')
-            print()
+            print(' ', i)
         print(RESET, end='')
 
 
-matrixxx = Grid(8, 2)
+matrixxx = Grid(20, 20)
 matrixxx.generate()
+matrixxx.add_pattern()
 
-
-output = visualizer(matrixxx, (19, 20), (7, 18))
+output = visualizer(matrixxx, (16, 16), (3, 8))
 output.input(matrix)
 output.draw("\033[1;92m", "\033[;36m")
