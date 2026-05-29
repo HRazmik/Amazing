@@ -32,5 +32,8 @@ Append entry coords, exit coords, and path
 Visualization
 
 Display the maze on screen
-Show walls, entry, exit, solution path
+Show walls, +
+entry, +
+exit, +
+solution path 
 User interactions (regenerate, toggle path, change colors)

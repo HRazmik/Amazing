@@ -37,15 +37,14 @@ class MazeConfig(BaseModel):
             raise ValueError("ENTRY and EXIT must be different")
         nx,ny = self.entry
         ex,ey = self.exit
-
         if not (0 <= nx < self.width and 0 <= ny < self.height):
             raise ValueError("entry out of bounds")
         if not (0 <= ex < self.width and 0 <= ey < self.height):
             raise ValueError("exit out of bounds")
-            
         return self
     
-def normalize_config(raw: dict) -> dict:
+def normalize_config(
+        raw: dict) -> dict:
     def parse_bool(v: str) -> bool:
         if v == "True":
             return True

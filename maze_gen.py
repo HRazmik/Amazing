@@ -1,6 +1,5 @@
 import random
 
-
 class Cell:
     def __init__(self, dev_mode: int = 0x0):
         self.walls = dev_mode #fully closed, (no)
@@ -13,7 +12,6 @@ class Cell:
     
     def add_wall(self, direction: int) -> None:
         self.walls |= direction
-
 
 
 class Grid:
@@ -62,11 +60,7 @@ class Grid:
         else:
             return bool(value.walls & 0x8)
 
-
-# === grdon@ sksec ===
     def generate(self) -> None:
-
-        flag = True
         for i in range(self.height):
             for j in range(self.width):
                 if i == 0:
@@ -75,9 +69,9 @@ class Grid:
                     self.cells[i][j].add_wall(0x4)
                 if j == 0:
                     self.cells[i][j].add_wall(0x8)
-
                 elif j == self.width - 1:
                     self.cells[i][j].add_wall(0x2)
+
     def add_pattern(self) -> None:
         ft_i = 0
         ft_j = 0
@@ -101,5 +95,3 @@ class Grid:
                 self.cells[i][j].add_wall(pattern_ft[pi][pj])
                 pj += 1
             pi += 1
-
-                

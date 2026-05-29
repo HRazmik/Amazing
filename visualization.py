@@ -45,7 +45,7 @@ class visualizer:
             self.b_matrix.append(temp_arr)
 
 
-    def input(self, maze: list[list[int]]) -> None:
+    def input(self) -> None:
         for i in range(self.grid.height):
             rend_i = i * 2 + 1
             for j in range(self.grid.width):
@@ -123,10 +123,21 @@ class visualizer:
         print(RESET, end='')
 
 
-matrixxx = Grid(20, 20)
-matrixxx.generate()
-matrixxx.add_pattern()
+from config_parsing import load_config
+import sys
 
-output = visualizer(matrixxx, (16, 16), (3, 8))
-output.input(matrix)
-output.draw("\033[1;92m", "\033[;36m")
+if __name__ == "__main__":
+    try:
+        config = load_config(sys.argv[1])
+        print(config)
+
+    except Exception as e:
+        print(f"[CONFIG ERROR] {e}")
+        exit(1)
+    matrixxx = Grid(config.height, config.width)
+    matrixxx.generate()
+    matrixxx.add_pattern()
+
+    # output = visualizer(matrixxx, config.entry, config.exit)
+    # output.input()
+    # output.draw("\033[1;92m", "\033[;36m")
