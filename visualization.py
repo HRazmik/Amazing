@@ -46,11 +46,12 @@ class visualizer:
 
 
     def input(self) -> None:
+        # count: int = 0
         for i in range(self.grid.height):
             rend_i = i * 2 + 1
             for j in range(self.grid.width):
                 rend_j = j * 2 + 1
-                if self.grid.north(i, j):
+                if i - 1 < 0 and self.grid.north(i, j):
                     self.b_matrix[rend_i - 1][rend_j] = BLOCK
                     if self.grid.west(i,j) or self.grid.north(i, j - 1):
                         self.b_matrix[rend_i - 1][rend_j - 1] = BLOCK
@@ -62,21 +63,22 @@ class visualizer:
                         self.b_matrix[rend_i + 1][rend_j - 1] = BLOCK
                     if self.grid.east(i, j) or self.grid.south(i, j + 1):
                         self.b_matrix[rend_i + 1][rend_j + 1] = BLOCK
+                    if self.grid.north(i + 1, j):
+                        self.b_matrix[rend_i + 1][rend_j - 1] = BLOCK
+                        self.b_matrix[rend_i + 1][rend_j + 1] = BLOCK
                 if self.grid.east(i, j):
                     self.b_matrix[rend_i][rend_j + 1] = BLOCK
                     if self.grid.east(i - 1, j):
                         self.b_matrix[rend_i - 1][rend_j + 1] = BLOCK
                     if self.grid.east(i + 1, j):
                         self.b_matrix[rend_i + 1][rend_j + 1] = BLOCK
-                if self.grid.west(i, j):
+                if  j - 1 < 0 and self.grid.west(i, j):
                     self.b_matrix[rend_i][rend_j - 1] = BLOCK
                     if self.grid.west(i - 1, j):
                         self.b_matrix[rend_i - 1][rend_j - 1] = BLOCK
                     if self.grid.west(i + 1, j):
                         self.b_matrix[rend_i + 1][rend_j - 1] = BLOCK
-                # if self.grid.get & 0xf == 15:
-                #     self.b_matrix[rend_i][rend_j] = BLOCK
-
+        # print(count)
 
     def draw(self, wall_colour: str, ft_colour: str) -> None:
         GREEN = "\033[0;32m"
@@ -123,10 +125,10 @@ class visualizer:
         print(RESET, end='')
 
 
-from config_parsing import load_config
-import sys
 
 if __name__ == "__main__":
+    from config_parsing import load_config
+    import sys
     try:
         config = load_config(sys.argv[1])
         print(config)
@@ -134,10 +136,12 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"[CONFIG ERROR] {e}")
         exit(1)
-    matrixxx = Grid(config.height, config.width)
-    matrixxx.generate()
-    matrixxx.add_pattern()
 
-    # output = visualizer(matrixxx, config.entry, config.exit)
-    # output.input()
-    # output.draw("\033[1;92m", "\033[;36m")
+    matrixxx = Grid(25, 20)
+    # matrixxx.generate()
+
+    # matrixxx.add_pattern()
+    matrixxx.change_grid(matrix)
+    output = visualizer(matrixxx, config.entry, config.exit)
+    output.input()
+    output.draw("\033[1;92m", "\033[;36m")
