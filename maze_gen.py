@@ -1,7 +1,7 @@
 import random
 
 class Cell:
-    def __init__(self, dev_mode: int = 0x0):
+    def __init__(self, dev_mode: int = 0xf):
         self.walls = dev_mode #fully closed, (no)
 
     # def has_wall(self, direction: int) -> bool:
@@ -104,3 +104,27 @@ class Grid:
                 self.cells[i][j].add_wall(pattern_ft[pi][pj])
                 pj += 1
             pi += 1
+
+    def get_neighbour(self, i: int, j: int):
+        neighbour = []
+        cell = self.cells[i][j]
+
+    # North
+        if i > 0 and not (cell.walls & 0x1):
+            neighbour.append((i - 1, j))
+
+    # East
+        if j < self.width - 1 and not (cell.walls & 0x2):
+            neighbour.append((i, j + 1))
+
+    # South
+        if i < self.height - 1 and not (cell.walls & 0x4):
+            neighbour.append((i + 1, j))
+
+    # West
+        if j > 0 and not (cell.walls & 0x8):
+            neighbour.append((i, j - 1))
+
+        return neighbour
+ 
+            
