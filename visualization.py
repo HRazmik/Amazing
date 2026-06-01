@@ -55,13 +55,13 @@ class visualizer:
                     self.b_matrix[rend_i - 1][rend_j] = BLOCK
                     self.b_matrix[rend_i - 1][rend_j - 1] = BLOCK
                     self.b_matrix[rend_i - 1][rend_j + 1] = BLOCK
-                if self.grid.south(i, j):
-                    self.b_matrix[rend_i + 1][rend_j] = BLOCK
-                    self.b_matrix[rend_i + 1][rend_j - 1] = BLOCK
-                    self.b_matrix[rend_i + 1][rend_j + 1] = BLOCK
                 if self.grid.east(i, j):
                     self.b_matrix[rend_i][rend_j + 1] = BLOCK
                     self.b_matrix[rend_i - 1][rend_j + 1] = BLOCK
+                    self.b_matrix[rend_i + 1][rend_j + 1] = BLOCK
+                if self.grid.south(i, j):
+                    self.b_matrix[rend_i + 1][rend_j] = BLOCK
+                    self.b_matrix[rend_i + 1][rend_j - 1] = BLOCK
                     self.b_matrix[rend_i + 1][rend_j + 1] = BLOCK
                 if  j == 0 and self.grid.west(i, j):
                     self.b_matrix[rend_i][rend_j - 1] = BLOCK
