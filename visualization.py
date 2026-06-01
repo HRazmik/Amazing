@@ -33,7 +33,11 @@ class visualizer:
     def __init__(self,
                  grid: Grid,
                  start: tuple[int, int],
-                 end: tuple[int, int]) -> None:
+                 end: tuple[int, int],
+                 path: list[tuple[int, int]]) -> None:
+        
+        self.path = path
+
         self.grid = grid
         self.b_matrix: list[list[str]] = []
         self.start: tuple[int, int] = start
@@ -100,15 +104,19 @@ class visualizer:
         for i in range(self.grid.height * 2 + 1):
             for j in range(self.grid.width * 2 + 1):
                 char = self.b_matrix[i][j] * 2
+                for coord in self.path:
+                    if i == self.start[0] * 2 + 1 and j == self.start[1] * 2 + 1:
+                        char = "\033[44m" + char + RESET + wall_colour
+                    elif i == self.end[0] * 2 + 1 and j == self.end[1] * 2 + 1:
+                        char = "\033[41m" + char + RESET + wall_colour
+                    elif i == (coord[0] * 2) + 1 and j == (coord[1] * 2) + 1:
+                        char = "\033[47m" + char + RESET + wall_colour
                 if i >= center_i - 5 and i <= center_i + 5 and j >= center_j - 7 and j <= center_j + 8:
                     if p42[i - (center_i - 5)][j - (center_j - 7)]:
                         print(ft_colour, end='')
                     else:
                         print(wall_colour, end='')
-                if i == self.start[0] * 2 + 1 and j == self.start[1] * 2 + 1:
-                    char = "\033[44m" + char + RESET + wall_colour
-                if i == self.end[0] * 2 + 1 and j == self.end[1] * 2 + 1:
-                    char = "\033[41m" + char + RESET + wall_colour
+
                 print(char, end='')
             print(' ', i)
         print(RESET, end='')
@@ -127,10 +135,10 @@ if __name__ == "__main__":
         exit(1)
 
     matrixxx = Grid(25, 20)
-    # matrixxx.generate()
+    matrixxx.generate()
 
-    # matrixxx.add_pattern()
-    matrixxx.change_grid(matrix)
-    output = visualizer(matrixxx, config.entry, config.exit)
+    matrixxx.add_pattern()
+    # matrixxx.change_grid(matrix)
+    output = visualizer(matrixxx, config.entry, config.exit, [])
     output.input()
-    output.draw("\033[1;92m", "\033[;36m")
+    output.draw("\033[1;94m", "\033[;35m")

@@ -1,11 +1,14 @@
-import random
+from random import randint
 
 class Cell:
     def __init__(self, dev_mode: int = 0xf):
         self.walls = dev_mode #fully closed, (no)
+        self.visited = False
 
     # def has_wall(self, direction: int) -> bool:
     #     return bool(self.walls & direction)
+    def visit(self) -> None:
+        self.visited = True
 
     def remove_wall(self, direction: int) -> None:
         self.walls &= ~direction
@@ -79,6 +82,12 @@ class Grid:
                 elif j == self.width - 1:
                     self.cells[i][j].add_wall(0x2)
 
+    def generate_maze(self) -> None:
+        stack: list[tuple[int, int]] = []
+        start = (randint(0, self.height), randint(0, self.width))
+        def recursion(i: int, j: int) -> None:
+            self.gr
+
     def add_pattern(self) -> None:
         ft_i = 0
         ft_j = 0
@@ -105,26 +114,28 @@ class Grid:
                 pj += 1
             pi += 1
 
-    def get_neighbour(self, i: int, j: int):
+    def get_neighbour(self, i: int, j: int) -> list[tuple[int, int]]:
         neighbour = []
         cell = self.cells[i][j]
-
-    # North
         if i > 0 and not (cell.walls & 0x1):
             neighbour.append((i - 1, j))
-
-    # East
         if j < self.width - 1 and not (cell.walls & 0x2):
             neighbour.append((i, j + 1))
-
-    # South
         if i < self.height - 1 and not (cell.walls & 0x4):
             neighbour.append((i + 1, j))
-
-    # West
         if j > 0 and not (cell.walls & 0x8):
             neighbour.append((i, j - 1))
-
         return neighbour
  
-            
+    def get_close_neighbour(self, i: int, j: int) -> list[tuple[int, int]]:
+        neighbour: list[tuple[int, int]] = []
+        cell = self.cells[i][j]
+        if i > 0 and (cell.walls & 0x1):
+            neighbour.append((i - 1, j))
+        if j < self.width - 1 and (cell.walls & 0x2):
+            neighbour.append((i, j + 1))
+        if i < self.height - 1 and (cell.walls & 0x4):
+            neighbour.append((i + 1, j))
+        if j > 0 and (cell.walls & 0x8):
+            neighbour.append((i, j - 1))
+        return neighbour
