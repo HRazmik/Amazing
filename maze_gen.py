@@ -118,6 +118,11 @@ class Grid:
             neighbour.append((i, j - 1))
         return neighbour
 
+    def set_beck(self) -> None:
+        for line in self.cells:
+            for cell in line:
+                cell.visited = False
+
     def generate(self, start: tuple[int, int] = (0, 0)) -> None:
         stack: list[tuple[int, int]] = []
         s_i, s_j = start

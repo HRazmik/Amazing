@@ -1,52 +1,41 @@
-from maze_gen import Grid
+from maze_gen import Grid, Cell
+from collections import deque
 
-
-def dfs_path(grid: Grid,
-             start: tuple[int, int],
-             goal: tuple[int, int]
-             ) -> list[tuple[int, int]]:
+def dfs_path(grid, start, goal):
     si, sj = start
     gi, gj = goal
 
-    visited = [[False for _ in range(grid.width)] for _ in range(grid.height)]
+    grid.set_beck()  
+
+    queue = deque()
     parent = {}
 
-    def dfs_rec(i: int, j: int) -> bool:
-        visited[i][j] = True
+    queue.append((si, sj))
+    grid.cells[si][sj].visit()
+
+    while queue:
+        i, j = queue.popleft()
+
         if (i, j) == (gi, gj):
-            return True
+            break
 
         for ni, nj in grid.get_neighbour(i, j):
-            if not visited[ni][nj]:
+            if not grid.cells[ni][nj].visited:
+                grid.cells[ni][nj].visit()
                 parent[(ni, nj)] = (i, j)
-                if dfs_rec(ni, nj):
-                    return True
+                queue.append((ni, nj))
 
-        return False
-    found = dfs_rec(si, sj)
-    if not found:
+    if (gi, gj) not in parent and (si, sj) != (gi, gj):
         return []
 
     curr = (gi, gj)
     path = []
 
-    while curr != ((si, sj)):
+    while curr != (si, sj):
         path.append(curr)
         curr = parent[curr]
 
     path.append((si, sj))
     path.reverse()
-    str_path = ""
-    for i in range (len(path) - 1):
-        ci, cj = path[i]
-        ni, nj = path[i + 1]
-        if ni < ci:
-            str_path += "N"
-        elif ni > ci:
-            str_path += "S"
-        elif nj < cj:
-            str_path += "W"
-        else:
-            str_path += "E"
-    print (str_path)
+
     return path
