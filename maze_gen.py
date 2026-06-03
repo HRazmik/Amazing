@@ -3,7 +3,7 @@ from random import randint, choice
 
 class Cell:
     def __init__(self, dev_mode: int = 0xf):
-        self.walls = dev_mode #fully closed, (no)
+        self.walls = dev_mode
         self.visited = False
 
     def visit(self) -> None:
@@ -21,16 +21,30 @@ class Grid:
         self.width = width
         self. height = height
         self.cells: list[list[Cell]] = []
+        self.center_i = self.height // 2 
+        self.center_j = self.width // 2
+        if self.height % 2 == 0:
+            self.center_i -= 1
+        if self.width % 2 == 0:
+            self.center_j -= 1
         for y in range(height):
             row: list[Cell] = []
             for x in range(width):
                 row.append(Cell( ))
             self.cells.append(row)
 
+    def output(self) -> None:
+        fd = open("output_maze.txt", "w+t")
+        for line in self.cells:
+            hex_line: str = ""
+            for cell in line:
+                hex_line += f"{cell.walls:X}"
+            hex_line += "\n"
+            fd.write(hex_line)
+            
     def get(self, x: int, y: int) -> Cell | None:
         if x >= 0 and y >= 0 and y < self.width and x < self.height:
-            return self.cells[x][y]
-        
+            return self.cells[x][y]        
         else:
             return None
 
@@ -77,16 +91,10 @@ class Grid:
                     [False, False, True, False, True, False, False],
                     [False, False, True, False, True, True, True]
                 ]
-        center_i = self.height // 2 
-        center_j = self.width // 2
-        if self.height % 2 == 0:
-            center_i -= 1
-        if self.width % 2 == 0:
-            center_j -= 1
         pi = 0
-        for i in range(center_i - 2, center_i + 3):
+        for i in range(self.center_i - 2, self.center_i + 3):
             pj = 0
-            for j in range(center_j - 3, center_j + 4):
+            for j in range(self.center_j - 3, self.center_j + 4):
                 if pattern_ft[pi][pj] is True:
                     self.cells[i][j].visit()
                 pj += 1
@@ -123,10 +131,61 @@ class Grid:
             for cell in line:
                 cell.visited = False
 
-    def generate(self, start: tuple[int, int] = (0, 0)) -> None:
+
+    def split_and_sample(self):
+
+        self.set_beck()
+        self.add_pattern()
+        row_mid_start = self.center_i - 2
+        col_mid_start = self.center_j - 3
+        row_mid_end = row_mid_start + 5
+        col_mid_end = col_mid_start + 7
+        row_bands = [
+            (0,             row_mid_start),
+            (row_mid_start, row_mid_end),
+            (row_mid_end,   self.height),
+        ]
+        col_bands = [
+            (0,             col_mid_start),
+            (col_mid_start, col_mid_end),
+            (col_mid_end,   self.width),
+        ]
+        for i, (r0, r1) in enumerate(row_bands):
+            for j, (c0, c1) in enumerate(col_bands):
+                if i == 1 and j == 1:
+                    continue
+                r = randint(r0, r1 - 1)
+                c = randint(c0, c1 - 1)
+                atempt = 0
+                while len(self.get_neib(r, c)) == 0:
+                    r = randint(r0, r1 - 1)
+                    c = randint(c0, c1 - 1)
+                    atempt += 1
+                    if atempt == 10:
+                        break
+                else:
+                    current = self.cells[r][c]
+                    ni, nj = choice(self.get_neib(r, c))
+                if ni < r:
+                    current.remove_wall(0x1)
+                    self.cells[ni][nj].remove_wall(0x4)
+                elif nj < c:
+                    current.remove_wall(0x8)
+                    self.cells[ni][nj].remove_wall(0x2)
+                elif ni > r:
+                    current.remove_wall(0x4)
+                    self.cells[ni][nj].remove_wall(0x1)
+                else:
+                    current.remove_wall(0x2)
+                    self.cells[ni][nj].remove_wall(0x8)
+
+
+    def generate(self,
+                 start: tuple[int, int],
+                 perfect_flag: bool) -> None:
         stack: list[tuple[int, int]] = []
         s_i, s_j = start
-        
+
         def recursion(i: int, j: int) -> bool:
             current: Cell = self.cells[i][j]
             current.visit()
@@ -149,9 +208,12 @@ class Grid:
                 if len(stack) == 0:
                     return True
                 ni, nj = stack.pop()
+                while len(self.get_neib(ni, nj)) == 0:
+                    if len(stack) == 0:
+                        return True
+                    ni, nj = stack.pop()
             if len(stack) != 0:
                 recursion(ni, nj)
             return False
-        
         
         recursion(s_i, s_j)

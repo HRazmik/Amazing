@@ -1,7 +1,10 @@
 from maze_gen import Grid, Cell
 from collections import deque
 
-def dfs_path(grid, start, goal):
+def dfs_path(grid: Grid,
+             start: tuple[int, int],
+             goal: tuple[int, int]
+             ) -> list[tuple[int, int]]:
     si, sj = start
     gi, gj = goal
 

@@ -1,7 +1,7 @@
 install:
 	pip install -r requirements.txt
 run:
-	python a_maze_ing.py config.txt
+	python3 a_maze_ing.py config.txt
 debug:
 	#vzgo
 clean:

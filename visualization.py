@@ -15,6 +15,7 @@ class visualizer:
         self.b_matrix: list[list[str]] = []
         self.start: tuple[int, int] = start
         self.end: tuple[int, int] = end
+
         for i in range(self.grid.height * 2 + 1):
             temp_arr: list[str] = []
             for j in range(self.grid.width * 2 + 1):
@@ -43,16 +44,14 @@ class visualizer:
                     self.b_matrix[rend_i - 1][rend_j - 1] = BLOCK
                     self.b_matrix[rend_i + 1][rend_j - 1] = BLOCK
 
-    def draw(self, wall_colour: str, ft_colour: str) -> None:
-        GREEN = "\033[0;32m"
-        RED = "\033[0;31m"
-        BLUE = "\033[0;34m"
-        BOLD_YELLOW = "\033[1;33m"
-        BG_RED = "\033[41m"  # Background color
+    def draw(self, colours_set: tuple[str, ...] = ("", '', '', '', '')) -> None:
+        WALL: str = colours_set[0]
+        FT: str = colours_set[1]
+        START: str = colours_set[2]
+        END: str = colours_set[3]
+        PATH: str = colours_set[4]
+
         RESET = "\033[0m"
-        START = "\033[0;102m"
-        END = "\033[0;104m"
-        PATH = "\033[0;105m"
         p42: list[list[int]] = [
             [1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
             [1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
@@ -66,7 +65,7 @@ class visualizer:
             [0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0],
             [0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0]
         ]
-        print(wall_colour, end='')
+        print(WALL, end='')
         center_i = (self.grid.height * 2 + 1) // 2
         center_j = (self.grid.width * 2 + 1) // 2
         if self.grid.width % 2 == 0:
@@ -78,16 +77,16 @@ class visualizer:
                 char = self.b_matrix[i][j] * 2
                 for coord in self.path:
                     if i == self.start[0] * 2 + 1 and j == self.start[1] * 2 + 1:
-                        char = START + char + RESET + wall_colour
+                        char = START + char + RESET + WALL
                     elif i == self.end[0] * 2 + 1 and j == self.end[1] * 2 + 1:
-                        char = END + char + RESET + wall_colour
+                        char = END + char + RESET + WALL
                     elif i == (coord[0] * 2) + 1 and j == (coord[1] * 2) + 1:
-                        char = PATH + char + RESET + wall_colour
+                        char = PATH + char + RESET + WALL
                 if i >= center_i - 5 and i <= center_i + 5 and j >= center_j - 7 and j <= center_j + 8:
                     if p42[i - (center_i - 5)][j - (center_j - 7)]:
-                        print(ft_colour, end='')
+                        print(FT, end='')
                     else:
-                        print(wall_colour, end='')
+                        print(WALL, end='')
 
                 print(char, end='')
             print()
