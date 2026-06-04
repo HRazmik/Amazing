@@ -1,6 +1,6 @@
-from random import randint, choice
+from random import randint, choice, seed
 
-
+seed(None)
 class Cell:
     def __init__(self, dev_mode: int = 0xf):
         self.walls = dev_mode
@@ -17,9 +17,10 @@ class Cell:
 
 
 class Grid:
-    def __init__(self, width: int, height: int) -> None:
+    def __init__(self, width: int, height: int, start: tuple[int, int]) -> None:
         self.width = width
         self. height = height
+        self.start: tuple[int, int] = start
         self.cells: list[list[Cell]] = []
         self.center_i = self.height // 2 
         self.center_j = self.width // 2
@@ -86,13 +87,16 @@ class Grid:
                     [0x1, 0xb, 0xf, 0xf, 0x1, 0x1, 0x1],
                     [0x1, 0xc, 0x7, 0xd, 0x5, 0x7, 0x1],
                     [0x1, 0x1, 0x1, 0xb, 0x1, 0x1, 0x1],
-                    [0x7, 0x3, 0x1, 0xa, 0x1, 0xd, 0x7],
+                    [0xd, 0x3, 0x1, 0xa, 0x1, 0xd, 0x7],
                     [0xf, 0xe, 0x1, 0xe, 0x1, 0x1, 0x1]
                 ]
         pi = 0
         for i in range(self.center_i - 2, self.center_i + 3):
             pj = 0
             for j in range(self.center_j - 3, self.center_j + 4):
+                if pattern_ft[pi][pj] == 0x1 and (i, j) == self.start:
+                    print("error")
+                    exit(1)
                 if pattern_ft[pi][pj] == 0x1:
                     self.cells[i][j].visit()
                 elif flag and pattern_ft[pi][pj] != 0x1:
@@ -145,11 +149,11 @@ class Grid:
                 row = randint(rt[0], rt[1] - 1)
                 col = randint(ct[0], ct[1] - 1)
                 atempt += 1
+                if atempt == 10:
+                    break
             if atempt == 10:
-                break
+                continue
             current = self.cells[row][col]
-            if atempt == 10:
-                break
             ni, nj = choice(self.get_neib(row, col))
             if ni < row:
                 current.remove_wall(0x1)
@@ -164,9 +168,13 @@ class Grid:
                 current.remove_wall(0x2)
                 self.cells[ni][nj].remove_wall(0x8)
 
-    def split_and_sample(self):
+    def split_and_sample(self) -> None:
         self.set_beck()
         self.add_pattern(False)
+        if self.height < 9 and self.width < 9:
+            for _ in range(4):
+                self.wall_destroyer((0, self.height - 1), (0, self.width - 1))
+            return
         row_mid_start = self.center_i - 2
         col_mid_start = self.center_j - 3
         row_mid_end = row_mid_start + 5
@@ -189,12 +197,11 @@ class Grid:
 
 
     def generate(self,
-                 start: tuple[int, int],
                  perfect_flag: bool = True) -> None:
         if self.height > 6 and self.width > 8:
             self.add_pattern(True)
         stack: list[tuple[int, int]] = []
-        ci, cj = start
+        ci, cj = self.start
         stack.append((ci, cj))
         while(len(stack) != 0):
             current: Cell = self.cells[ci][cj]
@@ -217,6 +224,8 @@ class Grid:
                 ci, cj = ni, nj
             except IndexError:
                 ci, cj = stack.pop()
+        if self.north(self.center_i - 3, self.center_j):
+            pass
 
         if not perfect_flag:
             self.split_and_sample()

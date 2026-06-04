@@ -13,10 +13,10 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"[CONFIG ERROR] {e}")
         exit(1)
-    matrixxx = Grid(config.height, config.width)
-    matrixxx.generate(config.entry, True)
+    matrixxx = Grid(config.height, config.width, config.entry)
+    matrixxx.generate(False)
 
-    matrixxx.output()
     path = dfs_path(matrixxx, config.entry, config.exit)
     output_2 = visualizer(matrixxx, config.entry, config.exit, path)
-    output_2.draw(colours_2)
+    output_2.draw(colours_2, False)
+    matrixxx.output()

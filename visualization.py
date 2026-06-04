@@ -25,7 +25,6 @@ class visualizer:
                 true_path.append((path[i][0] * 2 + 1, path[i + 1][1] * 2))
             else:
                 true_path.append((path[i][0] * 2 + 1, path[i][1] * 2))
-
         self.path = true_path
 
         for i in range(self.grid.height * 2 + 1):
@@ -35,7 +34,9 @@ class visualizer:
             self.b_matrix.append(temp_arr)
 
     def draw(self,
-             colours_set: tuple[str, ...] = ('', '', '', '', '')
+             colours_set: tuple[str, ...] = ('', '', '', '', ''),
+             ft_flag: bool = False,
+             path_flag: bool = False
              ) -> None:
         for i in range(self.grid.height):
             rend_i = i * 2 + 1
@@ -95,14 +96,13 @@ class visualizer:
                         char = START + char + RESET + WALL
                     elif i == self.end[0] * 2 + 1 and j == self.end[1] * 2 + 1:
                         char = END + char + RESET + WALL
-                    elif i == coord[0] and j == coord[1]:
+                    elif path_flag and i == coord[0] and j == coord[1]:
                         char = PATH + char + RESET + WALL
-                if i >= center_i - 5 and i <= center_i + 5 and j >= center_j - 7 and j <= center_j + 8:
+                if ft_flag and i >= center_i - 5 and i <= center_i + 5 and j >= center_j - 7 and j <= center_j + 8:
                     if p42[i - (center_i - 5)][j - (center_j - 7)]:
                         print(FT, end='')
                     else:
                         print(WALL, end='')
-
                 print(char, end='')
             print()
         print(RESET, end='')
