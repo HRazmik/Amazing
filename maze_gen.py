@@ -41,7 +41,7 @@ class Grid:
                 hex_line += f"{cell.walls:X}"
             hex_line += "\n"
             fd.write(hex_line)
-            
+
     def get(self, x: int, y: int) -> Cell | None:
         if x >= 0 and y >= 0 and y < self.width and x < self.height:
             return self.cells[x][y]        
@@ -81,22 +81,22 @@ class Grid:
         else:
             return bool(value.walls & 0x8)
 
-    def add_pattern(self) -> None:
-        ft_i = 0
-        ft_j = 0
-        pattern_ft :list[list[bool]]= [
-                    [True, False, False, False, True, True, True],
-                    [True, False, False, False, False, False, True],
-                    [True, True, True, False, True, True, True],
-                    [False, False, True, False, True, False, False],
-                    [False, False, True, False, True, True, True]
+    def add_pattern(self, flag: bool = False) -> None:
+        pattern_ft :list[list[int]]= [
+                    [0x1, 0xb, 0xf, 0xf, 0x1, 0x1, 0x1],
+                    [0x1, 0xc, 0x7, 0xd, 0x5, 0x7, 0x1],
+                    [0x1, 0x1, 0x1, 0xb, 0x1, 0x1, 0x1],
+                    [0x7, 0x3, 0x1, 0xa, 0x1, 0xd, 0x7],
+                    [0xf, 0xe, 0x1, 0xe, 0x1, 0x1, 0x1]
                 ]
         pi = 0
         for i in range(self.center_i - 2, self.center_i + 3):
             pj = 0
             for j in range(self.center_j - 3, self.center_j + 4):
-                if pattern_ft[pi][pj] is True:
+                if pattern_ft[pi][pj] == 0x1:
                     self.cells[i][j].visit()
+                elif flag and pattern_ft[pi][pj] != 0x1:
+                    self.cells[i][j].walls = pattern_ft[pi][pj]
                 pj += 1
             pi += 1
 
@@ -131,11 +131,42 @@ class Grid:
             for cell in line:
                 cell.visited = False
 
+    def wall_destroyer(self,
+                       rt:tuple[int, int],
+                       ct:tuple[int, int]) -> None:
+        atempt = 0
+        count = 1
+        if self.height * self.width >= 350:
+            count = self.height * self.width // 200
+        for _ in range(count):
+            row = randint(rt[0], rt[1] - 1)
+            col = randint(ct[0], ct[1] - 1)
+            while len(self.get_neib(row, col)) == 0:
+                row = randint(rt[0], rt[1] - 1)
+                col = randint(ct[0], ct[1] - 1)
+                atempt += 1
+            if atempt == 10:
+                break
+            current = self.cells[row][col]
+            if atempt == 10:
+                break
+            ni, nj = choice(self.get_neib(row, col))
+            if ni < row:
+                current.remove_wall(0x1)
+                self.cells[ni][nj].remove_wall(0x4)
+            elif nj < col:
+                current.remove_wall(0x8)
+                self.cells[ni][nj].remove_wall(0x2)
+            elif ni > row:
+                current.remove_wall(0x4)
+                self.cells[ni][nj].remove_wall(0x1)
+            else:
+                current.remove_wall(0x2)
+                self.cells[ni][nj].remove_wall(0x8)
 
     def split_and_sample(self):
-
         self.set_beck()
-        self.add_pattern()
+        self.add_pattern(False)
         row_mid_start = self.center_i - 2
         col_mid_start = self.center_j - 3
         row_mid_end = row_mid_start + 5
@@ -154,66 +185,39 @@ class Grid:
             for j, (c0, c1) in enumerate(col_bands):
                 if i == 1 and j == 1:
                     continue
-                r = randint(r0, r1 - 1)
-                c = randint(c0, c1 - 1)
-                atempt = 0
-                while len(self.get_neib(r, c)) == 0:
-                    r = randint(r0, r1 - 1)
-                    c = randint(c0, c1 - 1)
-                    atempt += 1
-                    if atempt == 10:
-                        break
-                else:
-                    current = self.cells[r][c]
-                    ni, nj = choice(self.get_neib(r, c))
-                if ni < r:
-                    current.remove_wall(0x1)
-                    self.cells[ni][nj].remove_wall(0x4)
-                elif nj < c:
-                    current.remove_wall(0x8)
-                    self.cells[ni][nj].remove_wall(0x2)
-                elif ni > r:
-                    current.remove_wall(0x4)
-                    self.cells[ni][nj].remove_wall(0x1)
-                else:
-                    current.remove_wall(0x2)
-                    self.cells[ni][nj].remove_wall(0x8)
+                self.wall_destroyer((r0, r1), (c0, c1))
 
 
     def generate(self,
                  start: tuple[int, int],
-                 perfect_flag: bool) -> None:
+                 perfect_flag: bool = True) -> None:
+        if self.height > 6 and self.width > 8:
+            self.add_pattern(True)
         stack: list[tuple[int, int]] = []
-        s_i, s_j = start
-
-        def recursion(i: int, j: int) -> bool:
-            current: Cell = self.cells[i][j]
+        ci, cj = start
+        stack.append((ci, cj))
+        while(len(stack) != 0):
+            current: Cell = self.cells[ci][cj]
             current.visit()
             try:
-                ni, nj = choice(self.get_neib(i, j))
-                if ni < i:
+                ni, nj = choice(self.get_neib(ci, cj))
+                if ni < ci:
                     current.remove_wall(0x1)
                     self.cells[ni][nj].remove_wall(0x4)
-                elif nj < j:
+                elif nj < cj:
                     current.remove_wall(0x8)
                     self.cells[ni][nj].remove_wall(0x2)
-                elif ni > i:
+                elif ni > ci:
                     current.remove_wall(0x4)
                     self.cells[ni][nj].remove_wall(0x1)
                 else:
                     current.remove_wall(0x2)
                     self.cells[ni][nj].remove_wall(0x8)
                 stack.append((ni, nj))
+                ci, cj = ni, nj
             except IndexError:
-                if len(stack) == 0:
-                    return True
-                ni, nj = stack.pop()
-                while len(self.get_neib(ni, nj)) == 0:
-                    if len(stack) == 0:
-                        return True
-                    ni, nj = stack.pop()
-            if len(stack) != 0:
-                recursion(ni, nj)
-            return False
+                ci, cj = stack.pop()
+
+        if not perfect_flag:
+            self.split_and_sample()
         
-        recursion(s_i, s_j)

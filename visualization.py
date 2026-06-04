@@ -10,11 +10,23 @@ class visualizer:
                  end: tuple[int, int],
                  path: list[tuple[int, int]]
                  ) -> None:
-        self.path = path
         self.grid = grid
         self.b_matrix: list[list[str]] = []
         self.start: tuple[int, int] = start
         self.end: tuple[int, int] = end
+        true_path: list[tuple[int, int]] = []
+        for i in range(len(path) - 1):
+            true_path.append((path[i][0] * 2 + 1, path[i][1] * 2 + 1))
+            if path[i][0] < path[i + 1][0]:
+                true_path.append((path[i + 1][0] * 2, path[i][1] * 2 + 1))
+            elif path[i][0] > path[i + 1][0]:
+                true_path.append((path[i][0] * 2, path[i][1] * 2 + 1))
+            elif path[i][1] < path[i + 1][1]:
+                true_path.append((path[i][0] * 2 + 1, path[i + 1][1] * 2))
+            else:
+                true_path.append((path[i][0] * 2 + 1, path[i][1] * 2))
+
+        self.path = true_path
 
         for i in range(self.grid.height * 2 + 1):
             temp_arr: list[str] = []
@@ -22,7 +34,9 @@ class visualizer:
                 temp_arr.append(" ")
             self.b_matrix.append(temp_arr)
 
-    def input(self) -> None:
+    def draw(self,
+             colours_set: tuple[str, ...] = ('', '', '', '', '')
+             ) -> None:
         for i in range(self.grid.height):
             rend_i = i * 2 + 1
             for j in range(self.grid.width):
@@ -44,7 +58,7 @@ class visualizer:
                     self.b_matrix[rend_i - 1][rend_j - 1] = BLOCK
                     self.b_matrix[rend_i + 1][rend_j - 1] = BLOCK
 
-    def draw(self, colours_set: tuple[str, ...] = ("", '', '', '', '')) -> None:
+
         WALL: str = colours_set[0]
         FT: str = colours_set[1]
         START: str = colours_set[2]
@@ -72,6 +86,7 @@ class visualizer:
             center_j -= 1
         if self.grid.height % 2 == 0:
             center_i -= 1
+
         for i in range(self.grid.height * 2 + 1):
             for j in range(self.grid.width * 2 + 1):
                 char = self.b_matrix[i][j] * 2
@@ -80,7 +95,7 @@ class visualizer:
                         char = START + char + RESET + WALL
                     elif i == self.end[0] * 2 + 1 and j == self.end[1] * 2 + 1:
                         char = END + char + RESET + WALL
-                    elif i == (coord[0] * 2) + 1 and j == (coord[1] * 2) + 1:
+                    elif i == coord[0] and j == coord[1]:
                         char = PATH + char + RESET + WALL
                 if i >= center_i - 5 and i <= center_i + 5 and j >= center_j - 7 and j <= center_j + 8:
                     if p42[i - (center_i - 5)][j - (center_j - 7)]:
