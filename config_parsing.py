@@ -9,6 +9,8 @@ class MazeConfig(BaseModel):
     exit: tuple[int, int]
     output_file: str = Field(...,min_length=1)
     perfect: bool
+    seed: int
+    color: bool = False
 
     @field_validator("entry", "exit", mode="before")
     @classmethod
@@ -58,6 +60,8 @@ def normalize_config(
         "exit": raw["EXIT"],
         "output_file": raw["OUTPUT_FILE"],
         "perfect": parse_bool(raw["PERFECT"]),
+        "seed": int(raw["SEED"]),
+        "color": parse_bool(raw.get("COLOR", "False"))
     }
 #parsing the file
 def parsing_config_file(path: str) -> dict:
@@ -74,6 +78,8 @@ def parsing_config_file(path: str) -> dict:
                     raise ValueError("Invalid way of assiging a key, value")
 
                 key, value = line.split("=", 1)
+                if key in config:
+                    raise ValueError(f"Duplicates are not allowed {key}")
                 config[key] = value
     except OSError:
         raise OSError("Problem with the file")
