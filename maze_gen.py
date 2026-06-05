@@ -1,10 +1,9 @@
 from random import randint, choice, seed
 from typing import Generator
 import time
-seed(None)
-
 
 class Cell:
+    """"""
     def __init__(self, dev_mode: int = 0xf):
         self.walls = dev_mode
         self.visited = False
@@ -20,6 +19,7 @@ class Cell:
 
 
 class Grid:
+    """"""
     def __init__(self,
                  width: int,
                  height: int,
@@ -103,10 +103,14 @@ class Grid:
             pj = 0
             for j in range(self.center_j - 3, self.center_j + 4):
                 if pattern_ft[pi][pj] == 0x1 and (i, j) == self.start:
-                    print("error")
+                    print(" *** ERROR *** ")
+                    print("entry is trapped inside the 42 pattern")
+                    print("change the entry coordinates inside config.txt")
                     return False
                 elif pattern_ft[pi][pj] == 0x1 and (i, j) == self.end:
-                    print("error")
+                    print(" *** ERROR *** ")
+                    print("exit is trapped inside the 42 pattern")
+                    print("change the exit coordinates inside config.txt")
                     return False
                 if pattern_ft[pi][pj] == 0x1:
                     self.cells[i][j].visit()
@@ -210,7 +214,8 @@ class Grid:
                 self.wall_destroyer((r0, r1), (c0, c1))
 
     def generate(self,
-                 flag: bool = False
+                 render_flag: bool = False,
+                 perfect_flag: bool = False
                  ) -> Generator[list[list[Cell]], None, None]:
         if self.height > 6 and self.width > 8:
             if not self.add_pattern(True):
@@ -239,11 +244,15 @@ class Grid:
                     self.cells[ni][nj].remove_wall(0x8)
                 stack.append((ni, nj))
                 ci, cj = ni, nj
-                if flag:
+                if render_flag:
+                    destroy: bool = True 
                     yield self.cells
                     time.sleep(0.1)
             except IndexError:
                 ci, cj = stack.pop()
-        if not flag:
-            yield self.cells
-            return
+            if perfect_flag and 0:
+                self.seek_and_destroy()
+                yield self.cells
+            if not render_flag:
+                yield self.cells
+                return

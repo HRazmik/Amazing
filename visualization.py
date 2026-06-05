@@ -7,24 +7,12 @@ SPACE = " "
 class visualizer:
     def __init__(self,
                  grid: Grid,
-                 path: list[tuple[int, int]]
+                 path: list[tuple[int, int]] = []
                  ) -> None:
         self.grid = grid
-
+        self.path = []
         self.start: tuple[int, int] = grid.start
         self.end: tuple[int, int] = grid.end
-        true_path: list[tuple[int, int]] = []
-        for i in range(len(path) - 1):
-            true_path.append((path[i][0] * 2 + 1, path[i][1] * 2 + 1))
-            if path[i][0] < path[i + 1][0]:
-                true_path.append((path[i + 1][0] * 2, path[i][1] * 2 + 1))
-            elif path[i][0] > path[i + 1][0]:
-                true_path.append((path[i][0] * 2, path[i][1] * 2 + 1))
-            elif path[i][1] < path[i + 1][1]:
-                true_path.append((path[i][0] * 2 + 1, path[i + 1][1] * 2))
-            else:
-                true_path.append((path[i][0] * 2 + 1, path[i][1] * 2))
-        self.path = true_path
         self.ground_maker()
 
     def ground_maker(self) -> None:
@@ -63,8 +51,22 @@ class visualizer:
                     self.b_matrix[rend_i - 1][rend_j - 1] = BLOCK
                     self.b_matrix[rend_i + 1][rend_j - 1] = BLOCK
 
+    def add_path(self, path) -> None:
+        true_path: list[tuple[int, int]] = []
+        for i in range(len(path) - 1):
+            true_path.append((path[i][0] * 2 + 1, path[i][1] * 2 + 1))
+            if path[i][0] < path[i + 1][0]:
+                true_path.append((path[i + 1][0] * 2, path[i][1] * 2 + 1))
+            elif path[i][0] > path[i + 1][0]:
+                true_path.append((path[i][0] * 2, path[i][1] * 2 + 1))
+            elif path[i][1] < path[i + 1][1]:
+                true_path.append((path[i][0] * 2 + 1, path[i + 1][1] * 2))
+            else:
+                true_path.append((path[i][0] * 2 + 1, path[i][1] * 2))
+        self.path = true_path
+
     def draw(self,
-             colours_set: tuple[str, ...] = ('', '', '', '', ''),
+             colours_set: tuple[str, ...],
              ft_flag: bool = False,
              path_flag: bool = False
              ) -> None:
