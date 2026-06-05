@@ -10,10 +10,10 @@ Read config.txt
 Validate all 6 mandatory keys
 
 
-Maze generation
+Maze generation +
 
 Carve passages randomly using a seed
-Apply all restrictions (no 3x3 open areas, border walls, "42" pattern, perfect mode)
+Apply all restrictions (no 3x3 open areas, border walls, "42" pattern, perfect mode) +
 
 
 Pathfinding
@@ -24,13 +24,16 @@ Store it as N/E/S/W string
 
 Output writer
 
-Convert each cell's walls to hex digit
-Write grid row by row to file
+Convert each cell's walls to hex digit 
+Write grid row by row to file 
 Append entry coords, exit coords, and path
 
 
 Visualization
 
 Display the maze on screen
-Show walls, entry, exit, solution path
+Show walls, +
+entry, +
+exit, +
+solution path + - 
 User interactions (regenerate, toggle path, change colors)
