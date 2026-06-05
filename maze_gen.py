@@ -236,14 +236,11 @@ class Grid:
                 stack.append((ni, nj))
                 ci, cj = ni, nj
                 if render_flag:
-                    destroy: bool = True 
+                    destroy = True 
                     yield self.cells
                     time.sleep(0.05)
             except IndexError:
                 ci, cj = stack.pop()
-        if perfect_flag and not destroy:
-            self.seek_and_destroy()
-            yield self.cells
         if not render_flag:
             yield self.cells
             return

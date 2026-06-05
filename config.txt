@@ -1,3 +1,4 @@
+#jhghg
 WIDTH=10
 HEIGHT=10
 ENTRY=0,0
