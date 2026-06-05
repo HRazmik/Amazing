@@ -101,14 +101,22 @@ class visualizer:
         for i in range(self.grid.height * 2 + 1):
             for j in range(self.grid.width * 2 + 1):
                 char = self.b_matrix[i][j] * 2
-                for coord in self.path:
+                if not self.path:
+
                     if (i == self.start[0] * 2 + 1
                             and j == self.start[1] * 2 + 1):
                         char = START + char + RESET + WALL
                     elif i == self.end[0] * 2 + 1 and j == self.end[1] * 2 + 1:
                         char = END + char + RESET + WALL
-                    elif path_flag and i == coord[0] and j == coord[1]:
-                        char = PATH + char + RESET + WALL
+                else:
+                    for coord in self.path:
+                        if (i == self.start[0] * 2 + 1
+                                and j == self.start[1] * 2 + 1):
+                            char = START + char + RESET + WALL
+                        elif i == self.end[0] * 2 + 1 and j == self.end[1] * 2 + 1:
+                            char = END + char + RESET + WALL
+                        elif path_flag and i == coord[0] and j == coord[1]:
+                            char = PATH + char + RESET + WALL
                 if (ft_flag
                     and i >= center_i - 5 and i <= center_i + 5
                         and j >= center_j - 7 and j <= center_j + 8):

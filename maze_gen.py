@@ -42,15 +42,6 @@ class Grid:
                 row.append(Cell())
             self.cells.append(row)
 
-    def output(self) -> None:
-        fd = open("output_maze.txt", "w+t")
-        for line in self.cells:
-            hex_line: str = ""
-            for cell in line:
-                hex_line += f"{cell.walls:X}"
-            hex_line += "\n"
-            fd.write(hex_line)
-
     def get(self, x: int, y: int) -> Cell | None:
         if x >= 0 and y >= 0 and y < self.width and x < self.height:
             return self.cells[x][y]
@@ -247,12 +238,12 @@ class Grid:
                 if render_flag:
                     destroy: bool = True 
                     yield self.cells
-                    time.sleep(0.1)
+                    time.sleep(0.05)
             except IndexError:
                 ci, cj = stack.pop()
-            if perfect_flag and 0:
-                self.seek_and_destroy()
-                yield self.cells
-            if not render_flag:
-                yield self.cells
-                return
+        if perfect_flag and not destroy:
+            self.seek_and_destroy()
+            yield self.cells
+        if not render_flag:
+            yield self.cells
+            return
