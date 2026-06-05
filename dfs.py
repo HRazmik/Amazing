@@ -1,5 +1,6 @@
 from maze_gen import Grid
 from collections import deque
+from typing import Deque
 
 
 def dfs_path(grid: Grid,
@@ -7,7 +8,8 @@ def dfs_path(grid: Grid,
              goal: tuple[int, int]
              ) -> list[tuple[int, int]]:
     """
-    Find a path in the maze from start to goal using Breadth-First Search (BFS).
+    Find a path in the maze from start to
+    goal using Breadth-First Search (BFS).
 
     This function uses BFS to ensure the shortest path
     in an unweighted maze.
@@ -27,7 +29,7 @@ def dfs_path(grid: Grid,
 
     grid.set_beck()
 
-    queue = deque()
+    queue: Deque[tuple[int, int]] = deque()
     parent = {}
 
     queue.append((si, sj))

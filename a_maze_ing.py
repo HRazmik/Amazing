@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     # path = dfs_path(matrixxx, config.entry, config.exit)
     output_2 = visualizer(matrixxx, [])
-    render = True
+    render = False
     vzgo = matrixxx.generate(render)
     for cells in vzgo:
         output_2.input(cells, render)
