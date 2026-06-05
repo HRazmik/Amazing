@@ -1,5 +1,6 @@
-from maze_gen import Grid, Cell
+from maze_gen import Grid
 from collections import deque
+
 
 def dfs_path(grid: Grid,
              start: tuple[int, int],
@@ -8,7 +9,7 @@ def dfs_path(grid: Grid,
     si, sj = start
     gi, gj = goal
 
-    grid.set_beck()  
+    grid.set_beck()
 
     queue = deque()
     parent = {}
