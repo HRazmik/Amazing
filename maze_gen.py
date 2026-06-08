@@ -1,7 +1,10 @@
-from random import randint, choice, seed
+from random import randint, choice
+from typing import Generator
+import time
 
-seed(None)
+
 class Cell:
+    """"""
     def __init__(self, dev_mode: int = 0xf):
         self.walls = dev_mode
         self.visited = False
@@ -11,18 +14,24 @@ class Cell:
 
     def remove_wall(self, direction: int) -> None:
         self.walls &= ~direction
-    
+
     def add_wall(self, direction: int) -> None:
         self.walls |= direction
 
 
 class Grid:
-    def __init__(self, width: int, height: int, start: tuple[int, int]) -> None:
-        self.width = width
-        self. height = height
+    """"""
+    def __init__(self,
+                 width: int,
+                 height: int,
+                 start: tuple[int, int],
+                 end: tuple[int, int]) -> None:
+        self.width: int = width
+        self.height: int = height
         self.start: tuple[int, int] = start
+        self.end: tuple[int, int] = end
         self.cells: list[list[Cell]] = []
-        self.center_i = self.height // 2 
+        self.center_i = self.height // 2
         self.center_j = self.width // 2
         if self.height % 2 == 0:
             self.center_i -= 1
@@ -31,28 +40,19 @@ class Grid:
         for y in range(height):
             row: list[Cell] = []
             for x in range(width):
-                row.append(Cell( ))
+                row.append(Cell())
             self.cells.append(row)
-
-    def output(self) -> None:
-        fd = open("output_maze.txt", "w+t")
-        for line in self.cells:
-            hex_line: str = ""
-            for cell in line:
-                hex_line += f"{cell.walls:X}"
-            hex_line += "\n"
-            fd.write(hex_line)
 
     def get(self, x: int, y: int) -> Cell | None:
         if x >= 0 and y >= 0 and y < self.width and x < self.height:
-            return self.cells[x][y]        
+            return self.cells[x][y]
         else:
             return None
 
-    def change_grid(self, matrix: list[list[int]]) -> None:
+    def change_grid(self, matrix: list[list[Cell]]) -> None:
         for i in range(self.height):
             for j in range(self.width):
-                self.cells[i][j].walls = matrix[i][j]
+                self.cells[i][j].walls = matrix[i][j].walls
 
     def north(self, i: int, j: int) -> bool:
         value = self.get(i, j)
@@ -82,8 +82,8 @@ class Grid:
         else:
             return bool(value.walls & 0x8)
 
-    def add_pattern(self, flag: bool = False) -> None:
-        pattern_ft :list[list[int]]= [
+    def add_pattern(self, flag: bool = False) -> bool:
+        pattern_ft: list[list[int]] = [
                     [0x1, 0xb, 0xf, 0xf, 0x1, 0x1, 0x1],
                     [0x1, 0xc, 0x7, 0xd, 0x5, 0x7, 0x1],
                     [0x1, 0x1, 0x1, 0xb, 0x1, 0x1, 0x1],
@@ -95,36 +95,33 @@ class Grid:
             pj = 0
             for j in range(self.center_j - 3, self.center_j + 4):
                 if pattern_ft[pi][pj] == 0x1 and (i, j) == self.start:
-                    print("error")
-                    exit(1)
+                    print(" *** ERROR *** ")
+                    print("entry is trapped inside the 42 pattern")
+                    print("change the entry coordinates inside config.txt")
+                    return False
+                elif pattern_ft[pi][pj] == 0x1 and (i, j) == self.end:
+                    print(" *** ERROR *** ")
+                    print("exit is trapped inside the 42 pattern")
+                    print("change the exit coordinates inside config.txt")
+                    return False
                 if pattern_ft[pi][pj] == 0x1:
                     self.cells[i][j].visit()
                 elif flag and pattern_ft[pi][pj] != 0x1:
                     self.cells[i][j].walls = pattern_ft[pi][pj]
                 pj += 1
             pi += 1
+        return True
 
     def get_neighbour(self, i: int, j: int) -> list[tuple[int, int]]:
-        neighbour = []
-        cell = self.cells[i][j]
-        if i > 0 and not (cell.walls & 0x1):
-            neighbour.append((i - 1, j))
-        if j < self.width - 1 and not (cell.walls & 0x2):
-            neighbour.append((i, j + 1))
-        if i < self.height - 1 and not (cell.walls & 0x4):
-            neighbour.append((i + 1, j))
-        if j > 0 and not (cell.walls & 0x8):
-            neighbour.append((i, j - 1))
-        return neighbour
- 
-    def get_neib(self, i: int, j: int) -> list[tuple[int, int]]:
         neighbour: list[tuple[int, int]] = []
         cell: Cell = self.cells[i][j]
         if i > 0 and (cell.walls & 0x1) and not self.cells[i - 1][j].visited:
             neighbour.append((i - 1, j))
-        if j < self.width - 1 and (cell.walls & 0x2) and not self.cells[i][j + 1].visited:
+        if (j < self.width - 1 and (cell.walls & 0x2)
+                and not self.cells[i][j + 1].visited):
             neighbour.append((i, j + 1))
-        if i < self.height - 1 and (cell.walls & 0x4) and not self.cells[i + 1][j].visited:
+        if (i < self.height - 1 and (cell.walls & 0x4)
+                and not self.cells[i + 1][j].visited):
             neighbour.append((i + 1, j))
         if j > 0 and (cell.walls & 0x8) and not self.cells[i][j - 1].visited:
             neighbour.append((i, j - 1))
@@ -136,16 +133,16 @@ class Grid:
                 cell.visited = False
 
     def wall_destroyer(self,
-                       rt:tuple[int, int],
-                       ct:tuple[int, int]) -> None:
-        atempt = 0
-        count = 1
+                       rt: tuple[int, int],
+                       ct: tuple[int, int]) -> None:
+        atempt: int = 0
+        count: int = 1
         if self.height * self.width >= 350:
-            count = self.height * self.width // 200
+            count: int = self.height * self.width // 200
         for _ in range(count):
-            row = randint(rt[0], rt[1] - 1)
-            col = randint(ct[0], ct[1] - 1)
-            while len(self.get_neib(row, col)) == 0:
+            row: int = randint(rt[0], rt[1] - 1)
+            col: int = randint(ct[0], ct[1] - 1)
+            while len(self.get_neighbour(row, col)) == 0:
                 row = randint(rt[0], rt[1] - 1)
                 col = randint(ct[0], ct[1] - 1)
                 atempt += 1
@@ -153,7 +150,7 @@ class Grid:
                     break
             if atempt == 10:
                 continue
-            current = self.cells[row][col]
+            current: Cell = self.cells[row][col]
             ni, nj = choice(self.get_neib(row, col))
             if ni < row:
                 current.remove_wall(0x1)
@@ -168,46 +165,58 @@ class Grid:
                 current.remove_wall(0x2)
                 self.cells[ni][nj].remove_wall(0x8)
 
-    def split_and_sample(self) -> None:
+    def seek_and_destroy(self,
+                         render_flag: bool = False
+                         ) -> Generator[list[list[Cell]], None, None]:
         self.set_beck()
         self.add_pattern(False)
         if self.height < 9 and self.width < 9:
             for _ in range(4):
                 self.wall_destroyer((0, self.height - 1), (0, self.width - 1))
+                if render_flag:
+                    yield self.cells
+        else:
+            row_mid_start = self.center_i - 2
+            col_mid_start = self.center_j - 3
+            row_mid_end = row_mid_start + 5
+            col_mid_end = col_mid_start + 7
+            row_bands = [
+                (0,             row_mid_start),
+                (row_mid_start, row_mid_end),
+                (row_mid_end,   self.height),
+            ]
+            col_bands = [
+                (0,             col_mid_start),
+                (col_mid_start, col_mid_end),
+                (col_mid_end,   self.width),
+            ]
+            for i, (r0, r1) in enumerate(row_bands):
+                for j, (c0, c1) in enumerate(col_bands):
+                    if i == 1 and j == 1:
+                        continue
+                    self.wall_destroyer((r0, r1), (c0, c1))
+                    if render_flag:
+                        yield self.cells
+        if not render_flag:
+            yield self.cells
             return
-        row_mid_start = self.center_i - 2
-        col_mid_start = self.center_j - 3
-        row_mid_end = row_mid_start + 5
-        col_mid_end = col_mid_start + 7
-        row_bands = [
-            (0,             row_mid_start),
-            (row_mid_start, row_mid_end),
-            (row_mid_end,   self.height),
-        ]
-        col_bands = [
-            (0,             col_mid_start),
-            (col_mid_start, col_mid_end),
-            (col_mid_end,   self.width),
-        ]
-        for i, (r0, r1) in enumerate(row_bands):
-            for j, (c0, c1) in enumerate(col_bands):
-                if i == 1 and j == 1:
-                    continue
-                self.wall_destroyer((r0, r1), (c0, c1))
-
 
     def generate(self,
-                 perfect_flag: bool = True) -> None:
+                 render_flag: bool = False
+                 ) -> Generator[list[list[Cell]], None, None]:
         if self.height > 6 and self.width > 8:
-            self.add_pattern(True)
+            if not self.add_pattern(True):
+                exit()
+        else:
+            print("42 pattern do not fit in")
         stack: list[tuple[int, int]] = []
         ci, cj = self.start
         stack.append((ci, cj))
-        while(len(stack) != 0):
+        while len(stack) != 0:
             current: Cell = self.cells[ci][cj]
             current.visit()
             try:
-                ni, nj = choice(self.get_neib(ci, cj))
+                ni, nj = choice(self.get_neighbour(ci, cj))
                 if ni < ci:
                     current.remove_wall(0x1)
                     self.cells[ni][nj].remove_wall(0x4)
@@ -222,11 +231,11 @@ class Grid:
                     self.cells[ni][nj].remove_wall(0x8)
                 stack.append((ni, nj))
                 ci, cj = ni, nj
+                if render_flag:
+                    yield self.cells
+                    time.sleep(0.05)
             except IndexError:
                 ci, cj = stack.pop()
-        if self.north(self.center_i - 3, self.center_j):
-            pass
-
-        if not perfect_flag:
-            self.split_and_sample()
-        
+        if not render_flag:
+            yield self.cells
+            return
