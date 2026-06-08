@@ -1,5 +1,19 @@
-from maze_gen import Grid
+from maze_gen import Grid, Cell
 from collections import deque
+
+
+def get_neighbour(grid: Grid, i: int, j: int) -> list[tuple[int, int]]:
+    neighbour: list[tuple[int, int]] = []
+    cell: Cell = grid.cells[i][j]
+    if i > 0 and not (cell.walls & 0x1):
+        neighbour.append((i - 1, j))
+    if j < grid.width - 1 and not (cell.walls & 0x2):
+        neighbour.append((i, j + 1))
+    if i < grid.height - 1 and not (cell.walls & 0x4):
+        neighbour.append((i + 1, j))
+    if j > 0 and not (cell.walls & 0x8):
+        neighbour.append((i, j - 1))
+    return neighbour
 
 
 def dfs_path(grid: Grid,
@@ -7,7 +21,7 @@ def dfs_path(grid: Grid,
              goal: tuple[int, int]
              ) -> list[tuple[int, int]]:
     """
-    Find a path in the maze from start to goal using Breadth-First Search (BFS).
+    Find a path in the maze from start to goal using Breadth-First Search(BFS).
 
     This function uses BFS to ensure the shortest path
     in an unweighted maze.

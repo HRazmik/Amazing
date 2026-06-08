@@ -1,6 +1,7 @@
-from random import randint, choice, seed
+from random import randint, choice
 from typing import Generator
 import time
+
 
 class Cell:
     """"""
@@ -112,19 +113,6 @@ class Grid:
         return True
 
     def get_neighbour(self, i: int, j: int) -> list[tuple[int, int]]:
-        neighbour = []
-        cell = self.cells[i][j]
-        if i > 0 and not (cell.walls & 0x1):
-            neighbour.append((i - 1, j))
-        if j < self.width - 1 and not (cell.walls & 0x2):
-            neighbour.append((i, j + 1))
-        if i < self.height - 1 and not (cell.walls & 0x4):
-            neighbour.append((i + 1, j))
-        if j > 0 and not (cell.walls & 0x8):
-            neighbour.append((i, j - 1))
-        return neighbour
-
-    def get_neib(self, i: int, j: int) -> list[tuple[int, int]]:
         neighbour: list[tuple[int, int]] = []
         cell: Cell = self.cells[i][j]
         if i > 0 and (cell.walls & 0x1) and not self.cells[i - 1][j].visited:
@@ -154,7 +142,7 @@ class Grid:
         for _ in range(count):
             row: int = randint(rt[0], rt[1] - 1)
             col: int = randint(ct[0], ct[1] - 1)
-            while len(self.get_neib(row, col)) == 0:
+            while len(self.get_neighbour(row, col)) == 0:
                 row = randint(rt[0], rt[1] - 1)
                 col = randint(ct[0], ct[1] - 1)
                 atempt += 1
@@ -177,40 +165,48 @@ class Grid:
                 current.remove_wall(0x2)
                 self.cells[ni][nj].remove_wall(0x8)
 
-    def seek_and_destroy(self) -> None:
+    def seek_and_destroy(self,
+                         render_flag: bool = False
+                         ) -> Generator[list[list[Cell]], None, None]:
         self.set_beck()
         self.add_pattern(False)
         if self.height < 9 and self.width < 9:
             for _ in range(4):
                 self.wall_destroyer((0, self.height - 1), (0, self.width - 1))
+                if render_flag:
+                    yield self.cells
+        else:
+            row_mid_start = self.center_i - 2
+            col_mid_start = self.center_j - 3
+            row_mid_end = row_mid_start + 5
+            col_mid_end = col_mid_start + 7
+            row_bands = [
+                (0,             row_mid_start),
+                (row_mid_start, row_mid_end),
+                (row_mid_end,   self.height),
+            ]
+            col_bands = [
+                (0,             col_mid_start),
+                (col_mid_start, col_mid_end),
+                (col_mid_end,   self.width),
+            ]
+            for i, (r0, r1) in enumerate(row_bands):
+                for j, (c0, c1) in enumerate(col_bands):
+                    if i == 1 and j == 1:
+                        continue
+                    self.wall_destroyer((r0, r1), (c0, c1))
+                    if render_flag:
+                        yield self.cells
+        if not render_flag:
+            yield self.cells
             return
-        row_mid_start = self.center_i - 2
-        col_mid_start = self.center_j - 3
-        row_mid_end = row_mid_start + 5
-        col_mid_end = col_mid_start + 7
-        row_bands = [
-            (0,             row_mid_start),
-            (row_mid_start, row_mid_end),
-            (row_mid_end,   self.height),
-        ]
-        col_bands = [
-            (0,             col_mid_start),
-            (col_mid_start, col_mid_end),
-            (col_mid_end,   self.width),
-        ]
-        for i, (r0, r1) in enumerate(row_bands):
-            for j, (c0, c1) in enumerate(col_bands):
-                if i == 1 and j == 1:
-                    continue
-                self.wall_destroyer((r0, r1), (c0, c1))
 
     def generate(self,
-                 render_flag: bool = False,
-                 perfect_flag: bool = False
+                 render_flag: bool = False
                  ) -> Generator[list[list[Cell]], None, None]:
         if self.height > 6 and self.width > 8:
             if not self.add_pattern(True):
-                return
+                exit()
         else:
             print("42 pattern do not fit in")
         stack: list[tuple[int, int]] = []
@@ -220,7 +216,7 @@ class Grid:
             current: Cell = self.cells[ci][cj]
             current.visit()
             try:
-                ni, nj = choice(self.get_neib(ci, cj))
+                ni, nj = choice(self.get_neighbour(ci, cj))
                 if ni < ci:
                     current.remove_wall(0x1)
                     self.cells[ni][nj].remove_wall(0x4)
@@ -236,7 +232,6 @@ class Grid:
                 stack.append((ni, nj))
                 ci, cj = ni, nj
                 if render_flag:
-                    destroy = True 
                     yield self.cells
                     time.sleep(0.05)
             except IndexError:
