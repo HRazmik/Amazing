@@ -187,12 +187,13 @@ We initially planned to split the work cleanly between core logic and visualizat
 ## Resources
 
 GeeksforGeeks – BFS and DFS
+Wikipedia
+
 
 ### AI usage
 
 Claude (claude.ai) was used during this project for the following:
 - Explaining concepts (bit manipulation, DFS vs BFS, maze generation theory)
-- Helping design the Cell and Grid data structure
 - Clarifying project requirements from the subject PDF
 - Reviewing code logic and catching bugs
 
