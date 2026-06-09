@@ -35,7 +35,7 @@ def main() -> None:
     path_flag: bool = False
     render: bool = False
     n: int = 0
-    path: list = []
+    path: list[tuple[int ,int]] = []
     maze_generated: bool = False
 
     matrixxx = Grid(config.height, config.width, config.entry, config.exit)

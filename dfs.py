@@ -1,7 +1,6 @@
 from maze_gen import Grid, Cell
 from collections import deque
 
-
 def get_neighbour(grid: Grid, i: int, j: int) -> list[tuple[int, int]]:
     neighbour: list[tuple[int, int]] = []
     cell: Cell = grid.cells[i][j]
@@ -41,7 +40,7 @@ def dfs_path(grid: Grid,
 
     grid.set_beck()
 
-    queue = deque()
+    queue: deque[tuple[int, int]] = deque()
     parent = {}
 
     queue.append((si, sj))
