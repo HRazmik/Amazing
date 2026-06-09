@@ -53,13 +53,14 @@ def dfs_path(grid: Grid,
         if (i, j) == (gi, gj):
             break
 
-        for ni, nj in grid.get_neighbour(i, j):
+        for ni, nj in get_neighbour(grid, i, j):
             if not grid.cells[ni][nj].visited:
                 grid.cells[ni][nj].visit()
                 parent[(ni, nj)] = (i, j)
                 queue.append((ni, nj))
 
     if (gi, gj) not in parent and (si, sj) != (gi, gj):
+        print(100001)
         return []
 
     curr = (gi, gj)

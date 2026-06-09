@@ -28,7 +28,7 @@ def main() -> None:
         config = load_config(sys.argv[1])
     except Exception as e:
         print(f"[CONFIG ERROR] {e}")
-        print("programs shats down")
+        print("program shats down")
         sys.exit(1)
 
     ft_flag: bool = False
@@ -42,16 +42,14 @@ def main() -> None:
     output_vs = visualizer(matrixxx)
     seed = int(time.time())
     maze_obj = matrixxx.generate(render)
-    for cells in maze_obj:
-        output_vs.input(cells, render)
+    output_vs.input(maze_obj.__next__(), render)
     if not config.perfect:
         rand_destroy = matrixxx.seek_and_destroy(True)
-        for cells in rand_destroy:
-            output_vs.input(cells, render)
+        output_vs.input(next(rand_destroy), True)
     clear_terminal()
     output_vs.draw(colours[n])
     path = dfs_path(matrixxx, config.entry, config.exit)
-    output(matrixxx, path_to_str(path))
+    output(config.output_file, matrixxx, path_to_str(path))
     maze_generated = True
 
     status: int = 0
@@ -82,7 +80,7 @@ def main() -> None:
                 clear_terminal()
                 output_vs.draw(colours[n])
             path = dfs_path(matrixxx, config.entry, config.exit)
-            output(matrixxx, path_to_str(path))
+            output(config.output_file, matrixxx, path_to_str(path))
 
         elif status == 2:
             if not maze_generated:
@@ -112,8 +110,16 @@ def main() -> None:
                 output_vs.input(cells, True)
                 clear_terminal()
                 output_vs.draw(colours[n])
+                time.sleep(0.05)
+            if not config.perfect:
+                rand_destroy = matrixxx.seek_and_destroy(True)
+                for cells in rand_destroy:
+                    output_vs.input(cells, True)
+                    clear_terminal()
+                    output_vs.draw(colours[n])
+                    time.sleep(0.2)
             path = dfs_path(matrixxx, config.entry, config.exit)
-            output(matrixxx, path_to_str(path))
+            output(config.output_file, matrixxx, path_to_str(path))
 
         elif status == 6:
             break

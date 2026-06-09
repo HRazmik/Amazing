@@ -4,7 +4,7 @@ import time
 
 
 class Cell:
-    """"""
+    """Class representing a single cell in the maze grid."""
     def __init__(self, dev_mode: int = 0xf):
         self.walls = dev_mode
         self.visited = False
@@ -20,7 +20,7 @@ class Cell:
 
 
 class Grid:
-    """"""
+    """Class representing the maze grid and its operations."""
     def __init__(self,
                  width: int,
                  height: int,
@@ -43,18 +43,41 @@ class Grid:
                 row.append(Cell())
             self.cells.append(row)
 
-    def get(self, x: int, y: int) -> Cell | None:
-        if x >= 0 and y >= 0 and y < self.width and x < self.height:
-            return self.cells[x][y]
+    def get(self, i: int, j: int) -> Cell | None:
+        """ returns the cell by the coordinates if they are correct, otherwise None
+
+        Args:
+            i (int): line of the necessary cell
+            j (int): column of the necessary cell
+
+        Returns:
+            Cell | None: returns the cell if the coordinates are correct, otherwise None
+        """
+        if i >= 0 and j >= 0 and j < self.width and i < self.height:
+            return self.cells[i][j]
         else:
             return None
 
     def change_grid(self, matrix: list[list[Cell]]) -> None:
+        """can be used to change the grid by the new one
+
+        Args:
+            matrix (list[list[Cell]]): new grid to change to
+        """
         for i in range(self.height):
             for j in range(self.width):
                 self.cells[i][j].walls = matrix[i][j].walls
 
     def north(self, i: int, j: int) -> bool:
+        """chacks if there is a wall in the north direction of the cell with coordinates (i, j)
+
+        Args:
+            i (int): coordinates of the cell in the line
+            j (int): coordinates of the cell in the column
+
+        Returns:
+            bool: returns True if there is a wall in the north direction of the cell with coordinates (i, j), otherwise False
+        """
         value = self.get(i, j)
         if value is None:
             return False
@@ -62,6 +85,15 @@ class Grid:
             return bool(value.walls & 0x1)
 
     def east(self, i: int, j: int) -> bool:
+        """chacks if there is a wall in the east direction of the cell with coordinates (i, j)
+
+        Args:
+            i (int): coordinates of the cell in the line
+            j (int): coordinates of the cell in the column
+
+        Returns:
+            bool: returns True if there is a wall in the east direction of the cell with coordinates (i, j), otherwise False
+        """
         value = self.get(i, j)
         if value is None:
             return False
@@ -69,6 +101,15 @@ class Grid:
             return bool(value.walls & 0x2)
 
     def south(self, i: int, j: int) -> bool:
+        """chacks if there is a wall in the south direction of the cell with coordinates (i, j)
+
+        Args:
+            i (int): coordinates of the cell in the line
+            j (int): coordinates of the cell in the column
+
+        Returns:
+            bool: returns True if there is a wall in the south direction of the cell with coordinates (i, j), otherwise False
+        """
         value = self.get(i, j)
         if value is None:
             return False
@@ -76,6 +117,15 @@ class Grid:
             return bool(value.walls & 0x4)
 
     def west(self, i: int, j: int) -> bool:
+        """chacks if there is a wall in the west direction of the cell with coordinates (i, j)
+
+        Args:
+            i (int): coordinates of the cell in the line
+            j (int): coordinates of the cell in the column
+
+        Returns:
+            bool: returns True if there is a wall in the west direction of the cell with coordinates (i, j), otherwise False
+        """
         value = self.get(i, j)
         if value is None:
             return False
@@ -83,6 +133,14 @@ class Grid:
             return bool(value.walls & 0x8)
 
     def add_pattern(self, flag: bool = False) -> bool:
+        """ adds the 42 pattern in the center of the maze, if flag is True, it also adds walls to the cells that are not part of the pattern but are in the 7x5 area around the center
+
+        Args:
+            flag (bool, optional): breakes the nacessary walls surounding 42 pattern, if flag is True. Defaults to False.
+
+        Returns:
+            bool: returns False if the entry or exit is trapped inside the 42 pattern, otherwise True
+        """
         pattern_ft: list[list[int]] = [
                     [0x1, 0xb, 0xf, 0xf, 0x1, 0x1, 0x1],
                     [0x1, 0xc, 0x7, 0xd, 0x5, 0x7, 0x1],
@@ -113,6 +171,15 @@ class Grid:
         return True
 
     def get_neighbour(self, i: int, j: int) -> list[tuple[int, int]]:
+        """Returns a list of neighboring cell coordinates that are accessible (i.e., not blocked by walls) and have not been visited.
+
+        Args:
+            i (int): The row index of the current cell.
+            j (int): The column index of the current cell.
+
+        Returns:
+            list[tuple[int, int]]: A list of tuples, where each tuple contains the coordinates (row, column) of a neighboring cell that can be visited next.
+        """
         neighbour: list[tuple[int, int]] = []
         cell: Cell = self.cells[i][j]
         if i > 0 and (cell.walls & 0x1) and not self.cells[i - 1][j].visited:
@@ -128,17 +195,23 @@ class Grid:
         return neighbour
 
     def set_beck(self) -> None:
+        """Resets the visited status of all cells in the grid to False, effectively "setting back" the grid to an unvisited state.
+        """
         for line in self.cells:
             for cell in line:
                 cell.visited = False
 
     def wall_destroyer(self,
                        rt: tuple[int, int],
-                       ct: tuple[int, int]) -> None:
+                       ct: tuple[int, int],
+                       count: int) -> None:
+        """Randomly destroys walls between cells in a specified rectangular region of the grid to create additional paths.
+
+        Args:
+            rt (tuple[int, int]): A tuple representing the range of row indices (start, end) for the rectangular region where walls will be destroyed.
+            ct (tuple[int, int]): A tuple representing the range of column indices (start, end) for the rectangular region where walls will be destroyed.
+        """
         atempt: int = 0
-        count: int = 1
-        if self.height * self.width >= 350:
-            count: int = self.height * self.width // 200
         for _ in range(count):
             row: int = randint(rt[0], rt[1] - 1)
             col: int = randint(ct[0], ct[1] - 1)
@@ -146,12 +219,13 @@ class Grid:
                 row = randint(rt[0], rt[1] - 1)
                 col = randint(ct[0], ct[1] - 1)
                 atempt += 1
-                if atempt == 10:
+                if atempt == 8:
                     break
-            if atempt == 10:
+            if atempt == 8:
                 continue
             current: Cell = self.cells[row][col]
-            ni, nj = choice(self.get_neib(row, col))
+            ni, nj = choice(self.get_neighbour(row, col))
+
             if ni < row:
                 current.remove_wall(0x1)
                 self.cells[ni][nj].remove_wall(0x4)
@@ -166,15 +240,27 @@ class Grid:
                 self.cells[ni][nj].remove_wall(0x8)
 
     def seek_and_destroy(self,
-                         render_flag: bool = False
+                         render_flag: bool = False,
+
                          ) -> Generator[list[list[Cell]], None, None]:
+        """_summary_
+
+        Args:
+            render_flag (bool, optional): _description_. Defaults to False.
+
+        Yields:
+            Generator[list[list[Cell]], None, None]: _description_
+        """
         self.set_beck()
         self.add_pattern(False)
+        count: int = self.height * self.width // 100 + 1
+
         if self.height < 9 and self.width < 9:
             for _ in range(4):
-                self.wall_destroyer((0, self.height - 1), (0, self.width - 1))
+                self.wall_destroyer((0, self.height - 1), (0, self.width - 1), count)
                 if render_flag:
                     yield self.cells
+            return
         else:
             row_mid_start = self.center_i - 2
             col_mid_start = self.center_j - 3
@@ -194,7 +280,7 @@ class Grid:
                 for j, (c0, c1) in enumerate(col_bands):
                     if i == 1 and j == 1:
                         continue
-                    self.wall_destroyer((r0, r1), (c0, c1))
+                    self.wall_destroyer((r0, r1), (c0, c1), count)
                     if render_flag:
                         yield self.cells
         if not render_flag:
@@ -204,6 +290,14 @@ class Grid:
     def generate(self,
                  render_flag: bool = False
                  ) -> Generator[list[list[Cell]], None, None]:
+        """_summary_
+
+        Args:
+            render_flag (bool, optional): _description_. Defaults to False.
+
+        Yields:
+            Generator[list[list[Cell]], None, None]: _description_
+        """
         if self.height > 6 and self.width > 8:
             if not self.add_pattern(True):
                 exit()
@@ -233,9 +327,7 @@ class Grid:
                 ci, cj = ni, nj
                 if render_flag:
                     yield self.cells
-                    time.sleep(0.05)
             except IndexError:
                 ci, cj = stack.pop()
-        if not render_flag:
-            yield self.cells
-            return
+        yield self.cells
+        return

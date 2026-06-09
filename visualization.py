@@ -5,6 +5,8 @@ SPACE = " "
 
 
 class visualizer:
+    """A class to visualize the maze in the terminal.
+    """
     def __init__(self,
                  grid: Grid,
                  path: list[tuple[int, int]] = []
@@ -16,6 +18,10 @@ class visualizer:
         self.ground_maker()
 
     def ground_maker(self) -> None:
+        """Initializes the base visualization matrix (b_matrix) with spaces,
+        creating a grid that is twice the size of the maze dimensions plus one to accommodate walls and paths.
+        This matrix serves as the canvas for rendering the maze structure and solution path.
+        """
         self.b_matrix: list[list[str]] = []
         for i in range(self.grid.height * 2 + 1):
             temp_arr: list[str] = []
@@ -27,6 +33,18 @@ class visualizer:
               matrix: list[list[Cell]] = [],
               render: bool = False
               ) -> None:
+        """ Updates the visualization matrix (b_matrix) based on the current state of the maze grid.
+        
+        If the render flag is set to True, it first updates the grid with the provided matrix and
+        then calls ground_maker to reset the visualization matrix.
+        It iterates through each cell in the maze grid and updates the corresponding positions in
+        b_matrix to represent walls using BLOCK characters based on the presence of walls in each
+        direction (north, east, south, west) for each cell.
+
+        Args:
+            matrix (list[list[Cell]], optional): matrix of Cells to input in visualization matrix. Defaults to [].
+            render (bool, optional): _description_. Defaults to False.
+        """
         if render:
             self.grid.change_grid(matrix)
             self.ground_maker()
@@ -101,7 +119,7 @@ class visualizer:
         for i in range(self.grid.height * 2 + 1):
             for j in range(self.grid.width * 2 + 1):
                 char = self.b_matrix[i][j] * 2
-                if not self.path:
+                if not path_flag:
 
                     if (i == self.start[0] * 2 + 1
                             and j == self.start[1] * 2 + 1):
@@ -115,7 +133,7 @@ class visualizer:
                             char = START + char + RESET + WALL
                         elif i == self.end[0] * 2 + 1 and j == self.end[1] * 2 + 1:
                             char = END + char + RESET + WALL
-                        elif path_flag and i == coord[0] and j == coord[1]:
+                        elif i == coord[0] and j == coord[1]:
                             char = PATH + char + RESET + WALL
                 if (ft_flag
                     and i >= center_i - 5 and i <= center_i + 5
