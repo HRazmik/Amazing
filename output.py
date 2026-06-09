@@ -22,5 +22,5 @@ def output(file_name: str, maze: Grid, path: str) -> None:
                 fd.write(path + "\n")
         except OSError:
             print("Error with output file")
-        except UnicodeEncodeError:
-            print("Error with output file")
+        except Exception:
+            print("Unknown Error with output file")

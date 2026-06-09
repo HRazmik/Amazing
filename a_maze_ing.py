@@ -73,6 +73,7 @@ def main() -> None:
             seed = int(time.time())
             random.seed(seed)
             matrixxx = Grid(config.height, config.width, config.entry, config.exit)
+            pattern_flag = matrixxx.pattern()
             output_vs = visualizer(matrixxx)
             maze_obj = matrixxx.generate(False)
             for cells in maze_obj:

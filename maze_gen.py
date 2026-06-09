@@ -43,6 +43,17 @@ class Grid:
                 row.append(Cell())
             self.cells.append(row)
 
+    def pattern(self) -> bool:
+        """ checks if the 42 pattern can be added to the grid
+
+        Returns:
+            bool: returns True if the 42 pattern can be added to the grid, otherwise False
+        """
+        self.pattern_state = False
+        if self.width > 8 and self.height > 8:
+            self.pattern_state = True
+        return self.pattern_state
+
     def get(self, i: int, j: int) -> Cell | None:
         """ returns the cell by the coordinates if they are correct, otherwise None
 
@@ -133,7 +144,8 @@ class Grid:
             return bool(value.walls & 0x8)
 
     def add_pattern(self, flag: bool = False) -> bool:
-        """ adds the 42 pattern in the center of the maze, if flag is True, it also adds walls to the cells that are not part of the pattern but are in the 7x5 area around the center
+        """ adds the 42 pattern in the center of the maze, if flag is True, it also
+        adds walls to the cells that are not part of the pattern but are in the 7x5 area around the center
 
         Args:
             flag (bool, optional): breakes the nacessary walls surounding 42 pattern, if flag is True. Defaults to False.
@@ -243,16 +255,22 @@ class Grid:
                          render_flag: bool = False,
 
                          ) -> Generator[list[list[Cell]], None, None]:
-        """_summary_
+        """ makes the maze imperfect by randomly destroying walls between 
+        cells in different regions of the grid, while optionally yielding
+        the state of the grid after each destruction for rendering purposes.
 
         Args:
-            render_flag (bool, optional): _description_. Defaults to False.
+            render_flag (bool, optional): if render_flag is True, and yields
+            the final state of the grid after all wall destructions if render_flag
+            is False. Defaults to False.
 
         Yields:
-            Generator[list[list[Cell]], None, None]: _description_
+            Generator[list[list[Cell]], None, None]: yields the state of the grid
+            (as a list of lists of Cell objects) after each wall destruction .
         """
         self.set_beck()
-        self.add_pattern(False)
+        if self.pattern_state:
+            self.add_pattern(False)
         count: int = self.height * self.width // 100 + 1
 
         if self.height < 9 and self.width < 9:
@@ -298,7 +316,7 @@ class Grid:
         Yields:
             Generator[list[list[Cell]], None, None]: _description_
         """
-        if self.height > 6 and self.width > 8:
+        if self.pattern_state:
             if not self.add_pattern(True):
                 exit()
         else:
