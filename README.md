@@ -187,7 +187,8 @@ We initially planned to split the work cleanly between core logic and visualizat
 ## Resources
 
 GeeksforGeeks – BFS and DFS
-Wikipedia
+Wikipedia - Poetry documentation
+
 
 
 ### AI usage
