@@ -20,7 +20,7 @@ optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "mazegen-0.1.0.tar.gz", hash = "sha256:4ab56747185c675927aa54874a49863c05df95bcfbef162a035a0bd592cf7c02"},
+    {file = "mazegen-0.1.0.tar.gz", hash = "sha256:2f9f89d9b674186d5324d4147d618b6c31fbe00d3037e74b4db7777e9a347779"},
 ]
 
 [package.source]

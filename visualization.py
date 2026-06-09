@@ -126,6 +126,8 @@ class visualizer:
         END: str = colours_set[3]
         PATH: str = colours_set[4]
         RESET = "\033[0m"
+        if self.grid.height < 9 or self.grid.width < 9:
+            ft_flag = False
         p42: list[list[int]] = [
             [1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
             [1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
