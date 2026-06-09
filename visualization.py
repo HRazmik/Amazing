@@ -125,7 +125,6 @@ class visualizer:
         START: str = colours_set[2]
         END: str = colours_set[3]
         PATH: str = colours_set[4]
-        ft_flag = self.grid.pattern_state
         RESET = "\033[0m"
         p42: list[list[int]] = [
             [1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
