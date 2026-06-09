@@ -1,5 +1,6 @@
-from maze_gen import Grid, Cell
+from mazegen import Grid, Cell
 from collections import deque
+
 
 def get_neighbour(grid: Grid, i: int, j: int) -> list[tuple[int, int]]:
     neighbour: list[tuple[int, int]] = []

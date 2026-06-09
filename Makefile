@@ -1,12 +1,9 @@
 install:
-	python3 -m venv .venv
-	source .venv/bin/activate
-	pip install -r requirements.txt
+	poetry install
 run:
 	python3 a_maze_ing.py config.txt
-# 	python3 output_validator.py output_maze.txt
 debug:
-	#vzgo
+	python3 -m pdb a_maze_ing.py config.txt
 clean:
 	rm -rf __pycache__
 	rm -rf .pytest_cache

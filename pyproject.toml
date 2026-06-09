@@ -1,17 +1,17 @@
-[project]
+[tool.poetry]
 name = "a-maze-ing"
 version = "0.1.0"
 description = ""
 authors = [
-    "HRazmik",
-    "h-nare"
+    "rovnania <rovnania@student.42yerevan.am>",
+    "narhakob <narhakob@student.42yerevan.am>"
 ]
 readme = "README.md"
-requires-python = "^3.10"
-dependencies = [
-    "pydantic (>=2.13.4,<3.0.0)"
-]
 
+[tool.poetry.dependencies]
+python = "^3.10"
+pydantic = ">=2.13.4,<3.0.0"
+mazegen = {path = "mazegen-0.1.0.tar.gz"}
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

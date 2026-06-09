@@ -1,6 +1,6 @@
 from config_parsing import load_config
 from visualization import visualizer
-from maze_gen import Grid
+from mazegen import Grid
 from dfs import dfs_path, path_to_str
 from output import output
 import random
@@ -31,16 +31,16 @@ def main() -> None:
         print("program shats down")
         sys.exit(1)
 
+    seed = config.seed if config.seed is not None else int(time.time())
+    random.seed(seed)
     ft_flag: bool = False
     path_flag: bool = False
     render: bool = False
     n: int = 0
-    path: list[tuple[int ,int]] = []
     maze_generated: bool = False
-
     matrixxx = Grid(config.height, config.width, config.entry, config.exit)
     output_vs = visualizer(matrixxx)
-    seed = int(time.time())
+    pattern_flag = matrixxx.pattern()
     maze_obj = matrixxx.generate(render)
     output_vs.input(maze_obj.__next__(), render)
     if not config.perfect:
@@ -48,6 +48,8 @@ def main() -> None:
         output_vs.input(next(rand_destroy), True)
     clear_terminal()
     output_vs.draw(colours[n])
+    if not pattern_flag:
+        print("42 pattern cannot be added to the maze due to its dimensions.")
     path = dfs_path(matrixxx, config.entry, config.exit)
     output(config.output_file, matrixxx, path_to_str(path))
     maze_generated = True
@@ -72,14 +74,17 @@ def main() -> None:
         if status == 1:
             seed = int(time.time())
             random.seed(seed)
-            matrixxx = Grid(config.height, config.width, config.entry, config.exit)
+            matrixxx = Grid(config.height, config.width,
+                            config.entry, config.exit)
             pattern_flag = matrixxx.pattern()
             output_vs = visualizer(matrixxx)
             maze_obj = matrixxx.generate(False)
             for cells in maze_obj:
                 output_vs.input(cells)
                 clear_terminal()
-                output_vs.draw(colours[n])
+            if not pattern_flag:
+                print("42 pattern cannot be added.")
+            output_vs.draw(colours[n])
             path = dfs_path(matrixxx, config.entry, config.exit)
             output(config.output_file, matrixxx, path_to_str(path))
 
@@ -104,7 +109,9 @@ def main() -> None:
 
         elif status == 5:
             random.seed(seed)
-            matrixxx = Grid(config.height, config.width, config.entry, config.exit)
+            matrixxx = Grid(config.height, config.width,
+                            config.entry, config.exit)
+            matrixxx.pattern()
             output_vs = visualizer(matrixxx)
             maze_obj = matrixxx.generate(True)
             for cells in maze_obj:

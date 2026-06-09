@@ -1,8 +1,8 @@
-from maze_gen import Grid
+from mazegen import Grid
 
 
 def output(file_name: str, maze: Grid, path: str) -> None:
-    """ 
+    """
     Output the maze structure and solution path to a text file.
     Args:
         maze (Grid): Maze grid containing cells and wall structure.
